@@ -1,4 +1,4 @@
-package algoritmos;
+package algorithms;
 
 public class NaiveBayes {
 

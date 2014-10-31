@@ -1,15 +1,17 @@
-package tests;
+package jUnit;
+
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import utilidades.Utilidades;
+import utils.Utilities;
+import exceptions.InvalidPathException;
 
 public class LoadFilesTest {
 	
@@ -17,6 +19,8 @@ public class LoadFilesTest {
 	private Integer numCorreos;
 	private final String RUTA_ENTRENAMIENTO = "C:\\Users\\a584183\\Desktop\\IA2 - WS\\Correos de entrenamiento";
 	private final String RUTA_PRUEBA = "C:\\Users\\a584183\\Desktop\\IA2 - WS\\Correos de prueba";
+	private final String RUTA_INVALIDA = "C:\\Users\\a584183\\Desktop\\IA2 - WS\\Correos de prueba\\enron6\\Summary.txt";
+	//private final String RUTA_FALLO = "";
 	private final String CATEGORIA_HAM = "ham";
 	private final String CATEGORIA_SPAM = "spam";
 
@@ -33,30 +37,39 @@ public class LoadFilesTest {
 
 	@Test
 	public void cuentaCorreosPruebaSpam() {
-		filesToAnalize = Utilidades.cargarCorreosEntrenamiento(RUTA_PRUEBA, CATEGORIA_SPAM);
+		filesToAnalize = Utilities.loadTrainingMails(RUTA_PRUEBA, CATEGORIA_SPAM);
 		numCorreos = filesToAnalize.size();
 		assertEquals(new Integer(4500), numCorreos);
 	}
 	
 	@Test
 	public void cuentaCorreosPruebaHam() {
-		filesToAnalize = Utilidades.cargarCorreosEntrenamiento(RUTA_PRUEBA, CATEGORIA_HAM);
+		filesToAnalize = Utilities.loadTrainingMails(RUTA_PRUEBA, CATEGORIA_HAM);
 		numCorreos = filesToAnalize.size();
 		assertEquals(new Integer(1500), numCorreos);
 	}
 	
 	@Test
 	public void cuentaCorreosEntrenamientoSpam() {
-		filesToAnalize = Utilidades.cargarCorreosEntrenamiento(RUTA_ENTRENAMIENTO, CATEGORIA_SPAM);
+		filesToAnalize = Utilities.loadTrainingMails(RUTA_ENTRENAMIENTO, CATEGORIA_SPAM);
 		numCorreos = filesToAnalize.size();
 		assertEquals(new Integer(12671), numCorreos);
 	}
 	
 	@Test
 	public void cuentaCorreosEntramientoHam() {
-		filesToAnalize = Utilidades.cargarCorreosEntrenamiento(RUTA_ENTRENAMIENTO, CATEGORIA_HAM);
+		filesToAnalize = Utilities.loadTrainingMails(RUTA_ENTRENAMIENTO, CATEGORIA_HAM);
 		numCorreos = filesToAnalize.size();
 		assertEquals(new Integer(15045), numCorreos);
 	}
-
+	
+	@Test(expected = InvalidPathException.class) 
+	public void testRutaInvalida(){
+		Utilities.loadTrainingMails(RUTA_INVALIDA, CATEGORIA_HAM);
+	}
+	
+	@Test(expected = NullPointerException.class)
+	public void testFalloRuta(){
+		Utilities.loadTrainingMails(null, CATEGORIA_HAM);
+	}
 }

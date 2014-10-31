@@ -1,8 +1,8 @@
-package excepciones;
+package exceptions;
 
 import java.io.File;
 
-public class OpenFileException extends Exception {
+public class OpenFileException extends RuntimeException {
 	
 	/**
 	 * 
