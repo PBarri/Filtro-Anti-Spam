@@ -1,6 +1,8 @@
 package utils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -22,6 +24,12 @@ public class Utilities {
 	 * @param category -> Si un correo es spam o ham
 	 * @return Una lista con todos los archivos que hay que analizar 
 	 */
+	
+	public static Integer numeroDocumentos= 0;
+	public static Map<String, Integer> mapspam = new HashMap<String, Integer>();
+	public static Map<String, Integer> mapham =  new HashMap<String, Integer>();
+	
+	
 	public static List<File> loadTrainingMails(String path, String category) {
 		
 		File file;
@@ -57,8 +65,11 @@ public class Utilities {
 		}else{ // Si es un archivo, y la carpeta padre es la categoría buscada, se añade a la lista de archivos a analizar
 			if(file.getParentFile().getName().equals(category)){
 				filesToAnalize.add(file);
+				
 			}
 		}
+		numeroDocumentos++;
+
 	}
 	
 	/**
@@ -67,22 +78,28 @@ public class Utilities {
 	 * @param result -> Mapa en el que se cargarán las palabras
 	 * @throws OpenFileException -> Error al abrir el archivo
 	 */
-	private static Map<String, Integer> loadWords(List<File> filesToAnalize) throws OpenFileException {
+	public static Map<String, Integer> loadWords(List<File> filesToAnalize) throws OpenFileException {
 		
 		Map<String, Integer> result = new HashMap<String, Integer>();
 		
 		for(File f : filesToAnalize){
 			try{
 				// Pasamos a una cadena de texto el correo
-				String text = Files.lines(f.toPath()).toString().toLowerCase();
+				FileReader fr = new FileReader (f);
+				char[] chars = new char[(int) f.length()];
+				fr.read(chars);
+				String content = new String(chars);
+				fr.close();
+				//String text = Files.lines(f.toPath()).toString().toLowerCase();
 				// Separamos las palabras y las ponemos en un array de String
-				String[] words = text.split("([^a-zA-Z0-9])+");
+				String[] words = content.split("([^a-zA-Z0-9])+");
+				
 				// Vamos añadiendo al mapa devuelto el número de veces que aparece esa palabra
 				for(String s : words){
 						if(!result.containsKey(s)){
 							result.put(s, 1);
 						}else{
-							result.put(s, result.getOrDefault(s, 0) + 1);
+							result.put(s, result.get(s) +1);
 						}
 				}
 			}catch (IOException e){
@@ -99,7 +116,7 @@ public class Utilities {
 	 * @param hamWords -> Palabras obtenidas de los correos que no son spam
 	 * @return Un mapa con la palabra como clave, y una lista de la forma [Probabilidad de que sea spam, Probabilidad de que sea ham]
 	 */
-	private static Map<String, List<Float>> generateProbabilities(Map<String, Integer> spamWords, Map<String, Integer> hamWords){
+	public static Map<String, List<Float>> generateProbabilities(Map<String, Integer> spamWords, Map<String, Integer> hamWords){
 		
 		Map<String, List<Float>> result = new HashMap<String, List<Float>>();
 		List<Float> aux = new ArrayList<Float>();

@@ -2,14 +2,14 @@ package application;
 
 import java.io.IOException;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
+import javafx.application.*;
+import javafx.fxml.*;
+import javafx.scene.*;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
+import javafx.stage.*;
 
 public class MainApplication extends Application {
-	
+
 	private Stage primaryStage;
 	private BorderPane mainWindow;
 
