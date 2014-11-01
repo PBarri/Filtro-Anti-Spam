@@ -2,6 +2,8 @@ package algorithms;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,33 +18,64 @@ public class NaiveBayes {
 		
 		/*Importante*/
 		/*
-		 * Antes de aplicar el algoritmo en si, debemos tener V (vocabulario que se extrae del conjunto de entrenamiento D)
-		 * y una segunda variable N =  número de documentos de D
+		 * REVISAR el numero total de Documentos: ahora mismo da 33722 pero al sumar lo indicado en los txt son mas
 		 */
 	
 		
 		//Ruta donde estan los corpus
 		String path   = "C:\\Users\\Alberto\\Desktop\\IA2\\corpus";
-		String category= "spam"; 
-		String category2 = "ham";
+		//Llamamos a la funcion principal
+		Utilities.loadTrainingMails(path);
+		/*Matriz auxiliar prior*/
+		Integer prior[]  = new Integer[2];
+	
+		 /*Numero de documentos del conjunto de entrenamiento*/
+		 Integer numeroDocumentos = Utilities.numeroDocumentosHam+ Utilities.numeroDocumentosSpam;
+	
+	
+		 /*Spam*/
+		 Map<String, Integer> mapspam = Utilities.mapspam;
+		 prior[0] = Utilities.numeroDocumentosSpam/numeroDocumentos;
+		 String texto_c_spam = Utilities.auxiliarSpam; 
+		 
+		/*Ham*/
+		 Map<String, Integer> mapham =  Utilities.mapham;		 
+		 prior[1] = Utilities.numeroDocumentosHam/numeroDocumentos;	 
+		 String texto_c_ham =  Utilities.auxiliarHam;
 		
-		//mapa con el vocabulario que aparece en los correos spam y su numero de apariciones
-		Map<String, Integer> mapspam = Utilities.loadWords( Utilities.loadTrainingMails(path, category));
-		
-		//mapa con el vocabulario que aparece en los correos ham y su numero de apariciones
-		Map<String,Integer> mapNospam = Utilities.loadWords(Utilities.loadTrainingMails(path, category2));
-		
-		//Varibale que nos indica el número total de documentos hay que dividirlo por 2 al llamar dos veces a iterateDirectories
-		//Una vez por cada categoría
-		Integer variableN = Utilities.numeroDocumentos/2;
-		
-		//Mapa con las pobabilidades
-		//Map<String,List<Float>> mapa =Utilities.generateProbabilities(mapspam, mapNospam);
+		/*Vocabulario total del conjunto de entrenamiento*/
+		Map<String,Integer> vocabulario =  getVocabulario(mapspam,mapham);
 
-		
-		
+		 
+	 
+		 /*Matriz auxiliar condpro*/
 		
 	
 	}
+	
+	public static Map<String,Integer> getVocabulario (Map<String,Integer> mapaSpam , Map<String,Integer> mapaHam){
+		Map<String,Integer> vocabulario = mapaSpam;
+		
+		Iterator<String> it = mapaHam.keySet().iterator();
+	
 
+		
+		String s = null;
+		while(it.hasNext())
+		{
+			 s =  it.next();
+			 
+			 if(!vocabulario.containsKey(s)){
+				 vocabulario.put(s, mapaHam.get(s));
+				}else{
+					vocabulario.put(s, vocabulario.get(s) +  mapaHam.get(s));
+				}
+			
+		}
+		
+		
+		
+		return vocabulario;
+		
+	}
 }

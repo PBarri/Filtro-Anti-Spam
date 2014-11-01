@@ -37,39 +37,39 @@ public class LoadFilesTest {
 
 	@Test
 	public void cuentaCorreosPruebaSpam() {
-		filesToAnalize = Utilities.loadTrainingMails(RUTA_PRUEBA, CATEGORIA_SPAM);
+		filesToAnalize = Utilities.loadTrainingMails(RUTA_PRUEBA);
 		numCorreos = filesToAnalize.size();
 		assertEquals(new Integer(4500), numCorreos);
 	}
 	
 	@Test
 	public void cuentaCorreosPruebaHam() {
-		filesToAnalize = Utilities.loadTrainingMails(RUTA_PRUEBA, CATEGORIA_HAM);
+		filesToAnalize = Utilities.loadTrainingMails(RUTA_PRUEBA);
 		numCorreos = filesToAnalize.size();
 		assertEquals(new Integer(1500), numCorreos);
 	}
 	
 	@Test
 	public void cuentaCorreosEntrenamientoSpam() {
-		filesToAnalize = Utilities.loadTrainingMails(RUTA_ENTRENAMIENTO, CATEGORIA_SPAM);
+		filesToAnalize = Utilities.loadTrainingMails(RUTA_ENTRENAMIENTO);
 		numCorreos = filesToAnalize.size();
 		assertEquals(new Integer(12671), numCorreos);
 	}
 	
 	@Test
 	public void cuentaCorreosEntramientoHam() {
-		filesToAnalize = Utilities.loadTrainingMails(RUTA_ENTRENAMIENTO, CATEGORIA_HAM);
+		filesToAnalize = Utilities.loadTrainingMails(RUTA_ENTRENAMIENTO);
 		numCorreos = filesToAnalize.size();
 		assertEquals(new Integer(15045), numCorreos);
 	}
 	
 	@Test(expected = InvalidPathException.class) 
 	public void testRutaInvalida(){
-		Utilities.loadTrainingMails(RUTA_INVALIDA, CATEGORIA_HAM);
+		Utilities.loadTrainingMails(RUTA_INVALIDA);
 	}
 	
 	@Test(expected = NullPointerException.class)
 	public void testFalloRuta(){
-		Utilities.loadTrainingMails(null, CATEGORIA_HAM);
+		Utilities.loadTrainingMails(null);
 	}
 }

@@ -25,12 +25,17 @@ public class Utilities {
 	 * @return Una lista con todos los archivos que hay que analizar 
 	 */
 	
-	public static Integer numeroDocumentos= 0;
+	public static Integer numeroDocumentosSpam= 0;
+	public static Integer numeroDocumentosHam = 0;
 	public static Map<String, Integer> mapspam = new HashMap<String, Integer>();
 	public static Map<String, Integer> mapham =  new HashMap<String, Integer>();
 	
 	
-	public static List<File> loadTrainingMails(String path, String category) {
+	public  static String auxiliarSpam =" ";
+	public  static String auxiliarHam =" ";
+	
+
+	public static List<File> loadTrainingMails(String path) {
 		
 		File file;
 		List<File> filesToAnalize = new ArrayList<File>();
@@ -39,10 +44,12 @@ public class Utilities {
 			file = new File(path);
 			// Comprobamos que nos han pasado una ruta de una carpeta y no de un archivo
 			if(file.isDirectory()){
-				iterateDirectories(file, filesToAnalize, category);
+				
+				iterateDirectories(file);
 			}else{
 				throw new InvalidPathException("La ruta es inválida");
 			}			
+		
 		} catch (NullPointerException e) {
 			throw new NullPointerException("Inserte la ruta");
 		} 
@@ -56,19 +63,28 @@ public class Utilities {
 	 * @param filesToAnalize -> Lista de archivos que se utilizarán para cargar las palabras
 	 * @param category -> Si es spam o ham
 	 */
-	private static void iterateDirectories(File file, List<File> filesToAnalize, String category) {
+	private static void iterateDirectories(File file) {
 		// Si el archivo es un directorio, se van recorriendo todos sus hijos llamando recursivamente a este método
+		
 		if(file.isDirectory()){
 			for(File f: file.listFiles()){
-				iterateDirectories(f, filesToAnalize, category);
+				iterateDirectories(f);
 			}
-		}else{ // Si es un archivo, y la carpeta padre es la categoría buscada, se añade a la lista de archivos a analizar
-			if(file.getParentFile().getName().equals(category)){
-				filesToAnalize.add(file);
+		}else{ // Si es un archivo se manda a una función para que sea analizado
+			
+			
+			if(file.getParentFile().getName().equals("spam")){
+				loadWords(file,"spam");
+				numeroDocumentosSpam++;
+			}else
+			{
 				
+				loadWords(file,"ham");
+				numeroDocumentosHam++;
 			}
+		
 		}
-		numeroDocumentos++;
+		
 
 	}
 	
@@ -78,36 +94,51 @@ public class Utilities {
 	 * @param result -> Mapa en el que se cargarán las palabras
 	 * @throws OpenFileException -> Error al abrir el archivo
 	 */
-	public static Map<String, Integer> loadWords(List<File> filesToAnalize) throws OpenFileException {
+	public static void loadWords(File file , String categoria) throws OpenFileException {
 		
-		Map<String, Integer> result = new HashMap<String, Integer>();
+	
 		
-		for(File f : filesToAnalize){
+			
 			try{
 				// Pasamos a una cadena de texto el correo
-				FileReader fr = new FileReader (f);
-				char[] chars = new char[(int) f.length()];
+				FileReader fr = new FileReader (file);
+				char[] chars = new char[(int) file.length()];
 				fr.read(chars);
 				String content = new String(chars);
 				fr.close();
-				//String text = Files.lines(f.toPath()).toString().toLowerCase();
+				if(categoria.equals("spam"))
+					auxiliarSpam.concat(content+" ");
+				else
+					auxiliarHam.concat(content+" ");
 				// Separamos las palabras y las ponemos en un array de String
 				String[] words = content.split("([^a-zA-Z0-9])+");
 				
 				// Vamos añadiendo al mapa devuelto el número de veces que aparece esa palabra
 				for(String s : words){
-						if(!result.containsKey(s)){
-							result.put(s, 1);
+					
+					if(categoria.equals("spam")){
+						
+								if(!mapspam.containsKey(s)){
+									mapspam.put(s, 1);
+								}else{
+									mapspam.put(s, mapspam.get(s) +1);
+								}
+					}else{
+						
+						if(!mapham.containsKey(s)){
+							mapham.put(s, 1);
 						}else{
-							result.put(s, result.get(s) +1);
+							mapham.put(s, mapham.get(s) +1);
 						}
+						
+					}
 				}
 			}catch (IOException e){
-				throw new OpenFileException(f);
+				throw new OpenFileException(file);
 			}
-		}		
+				
 		
-		return result;
+		
 	}
 	
 	/**
