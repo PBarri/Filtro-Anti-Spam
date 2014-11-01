@@ -45,14 +45,33 @@ public class NaiveBayes {
 		
 		/*Vocabulario total del conjunto de entrenamiento*/
 		Map<String,Integer> vocabulario =  getVocabulario(mapspam,mapham);
-
-		 
-	 
+		/*NumeroTotalPalabras*/
+		Integer totalwords =0;
+		totalwords+=total(mapspam);
+		totalwords+=total(mapham);
 		 /*Matriz auxiliar condpro*/
+		Map<String,List<Float> > condprob = Utilities.generateProbabilities(mapspam, mapham);
 		
 	
+		
+		System.out.println(condprob.toString());
 	}
 	
+	public static Integer total(Map<String,Integer> map)
+	{
+		Integer i = 0;
+		Iterator<Integer> it = map.values().iterator();		
+		while(it.hasNext())
+		{
+			i += it.next() +1;
+			
+		}
+		return i;
+	}
+	
+	
+	
+	/*Unifica los dos mapas*/
 	public static Map<String,Integer> getVocabulario (Map<String,Integer> mapaSpam , Map<String,Integer> mapaHam){
 		Map<String,Integer> vocabulario = mapaSpam;
 		
