@@ -11,6 +11,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Probability;
+import views.MainApplicationController;
 import views.NaiveBayesDataController;
 import algorithms.NaiveBayes2;
 
@@ -35,7 +36,7 @@ public class MainApplication extends Application {
 		this.alg = new NaiveBayes2();
 		
 		initMainWindow();
-		showProbabilitiesOverview();
+		//showNaiveBayesData();
 	}
 
 	public void initMainWindow() {
@@ -44,6 +45,9 @@ public class MainApplication extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApplication.class.getResource("/views/MainApplication.fxml"));
 			mainWindow = (BorderPane) loader.load();
+			
+			MainApplicationController controller = loader.getController();
+			controller.setMainApp(this);
 			
 			Scene scene = new Scene(mainWindow);
 			primaryStage.setScene(scene);
@@ -55,14 +59,14 @@ public class MainApplication extends Application {
 		}
 	}
 	
-	public void showProbabilitiesOverview(){
+	public void showNaiveBayesData(String paths){
 		try{
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApplication.class.getResource("/views/NaiveBayesData.fxml"));
-			AnchorPane probabilitiesOverview = (AnchorPane) loader.load();
+			AnchorPane naiveBayesData = (AnchorPane) loader.load();
 			
-			mainWindow.setCenter(probabilitiesOverview);
-			
+			mainWindow.setCenter(naiveBayesData);
+				
 			NaiveBayesDataController controller = loader.getController();
 			
 			String path = "C:\\Users\\Desarrollador\\Desktop\\Corpus";
