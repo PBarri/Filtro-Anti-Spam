@@ -34,6 +34,9 @@ public class NaiveBayes2 {
 		this.hamWords = new HashMap<String, Integer>();
 		this.vocabulary = new HashSet<String>();
 		this.totalWords = 0;
+		this.nDocuments = 0;
+		this.nSpamDocuments = 0;
+		this.nHamDocuments = 0;
 	}
 
 	public Integer getnDocuments() {
@@ -180,10 +183,12 @@ public class NaiveBayes2 {
 			String[] fileWords = content.split("([^a-zA-Z0-9])+");
 			totalWords += fileWords.length;
 			if (file.getParentFile().getName().equals(SPAM)){
+				nSpamDocuments++;
 				for(String s : fileWords){
 					spamWords.put(s, spamWords.getOrDefault(s, 0) + 1);
 				}
 			} else {
+				nHamDocuments++;
 				for(String s : fileWords){
 					hamWords.put(s, hamWords.getOrDefault(s, 0) + 1);
 				}
@@ -208,13 +213,12 @@ public class NaiveBayes2 {
 	private Map<String, List<Float>> generateProbabilities(Map<String, Integer> spamWords, Map<String, Integer> hamWords) {
 
 		Map<String, List<Float>> result = new HashMap<String, List<Float>>();
-		List<Float> aux = new ArrayList<Float>();
 		Float prob = new Float(0.0);
+		
 
 		// Se recorren los mapas para calcular las probabilidades
 		for (Entry<String, Integer> entry : spamWords.entrySet()) {
-			// Limpiamos la lista auxiliar
-			aux.clear();
+			List<Float> aux = new ArrayList<Float>();
 			// Calculamos la probabilidad de que la palabra sea spam
 			prob = entry.getValue().floatValue() / totalWords;
 			aux.add(0, prob);
@@ -225,8 +229,7 @@ public class NaiveBayes2 {
 		}
 
 		for (Entry<String, Integer> entry : hamWords.entrySet()) {
-			// Limpiamos la lista auxiliar
-			aux.clear();
+			List<Float> aux = new ArrayList<Float>();
 			// Calculamos la probabilidad de que la palabra sea ham
 			prob = entry.getValue().floatValue() / totalWords;
 			// Apareció en el mapa de palabras spam

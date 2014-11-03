@@ -47,12 +47,15 @@ public class ProbabilitiesOverviewController {
 	}
 	
 	public void getProbabilities(NaiveBayes2 alg, ObservableList<Probability> ol){
-		alg.train("C:\\Users\\Pablo\\UNIVERSIDAD\\En curso\\4º\\Inteligencia Artificial 2\\Filtro Anti-Spam\\Corpus");
+		alg.train("C:\\Users\\a584183\\Desktop\\Corpus");
 		String word, spamP, hamP;
+		Float probSpam, probHam;
 		for(Entry<String, List<Float>> entry : alg.getProbabilities().entrySet()){
+			probSpam = entry.getValue().get(0);
+			probHam = entry.getValue().get(1);
 			word = entry.getKey();
-			spamP = entry.getValue().get(0).toString();
-			hamP = entry.getValue().get(1).toString();
+			spamP = probSpam.toString();
+			hamP = probHam.toString();
 			Probability p = new Probability(word, spamP, hamP);
 			ol.add(p);
 		}
