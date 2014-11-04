@@ -19,6 +19,7 @@ public class NaiveBayes2 {
 	private static final String SPAM = "spam";
 	//private static final String HAM = "ham";
 
+	private String path;
 	private Integer nDocuments;
 	private Integer totalWords;
 	private Integer nSpamDocuments;
@@ -37,6 +38,15 @@ public class NaiveBayes2 {
 		this.nDocuments = 0;
 		this.nSpamDocuments = 0;
 		this.nHamDocuments = 0;
+		this.path = "";
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public Integer getnDocuments() {
@@ -111,7 +121,12 @@ public class NaiveBayes2 {
 	 * @param path
 	 *            -> Ruta padre en la que estén todos los archivos
 	 */
-	public void train(String path) {
+	public void train(String path){
+		this.path = path;
+		this.train();
+	}
+	
+	public void train() {
 
 		File file;
 		List<File> filesToAnalize = new ArrayList<File>();

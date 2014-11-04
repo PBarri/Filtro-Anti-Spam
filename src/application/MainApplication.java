@@ -20,9 +20,28 @@ public class MainApplication extends Application {
 	private Stage primaryStage;
 	private BorderPane mainWindow;
 	private NaiveBayes2 alg;
-	
 	// Lista para ver las probabilidades
 	private ObservableList<Probability> probabilitiesData = FXCollections.observableArrayList();
+	
+	public BorderPane getMainWindow() {
+		return mainWindow;
+	}
+
+	public void setMainWindow(BorderPane mainWindow) {
+		this.mainWindow = mainWindow;
+	}
+
+	public NaiveBayes2 getAlg() {
+		return alg;
+	}
+
+	public void setAlg(NaiveBayes2 alg) {
+		this.alg = alg;
+	}
+
+	public void setProbabilitiesData(ObservableList<Probability> probabilitiesData) {
+		this.probabilitiesData = probabilitiesData;
+	}
 
 	public ObservableList<Probability> getProbabilitiesData() {
 		return probabilitiesData;
@@ -59,7 +78,7 @@ public class MainApplication extends Application {
 		}
 	}
 	
-	public void showNaiveBayesData(String paths){
+	public void showNaiveBayesData(){
 		try{
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApplication.class.getResource("/views/NaiveBayesData.fxml"));
@@ -69,12 +88,9 @@ public class MainApplication extends Application {
 				
 			NaiveBayesDataController controller = loader.getController();
 			
-			String path = "C:\\Users\\Desarrollador\\Desktop\\Corpus";
-			alg.train(path);
-			
 			controller.setMainApplication(this);
 			controller.getProbabilities(alg, probabilitiesData);
-			controller.getAlgorithmData(alg, path);
+			controller.getAlgorithmData(alg);
 		}catch(IOException e){
 			e.printStackTrace();
 		}

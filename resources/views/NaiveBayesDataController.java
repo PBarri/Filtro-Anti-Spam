@@ -77,8 +77,8 @@ public class NaiveBayesDataController {
 		table.setItems(ol);
 	}
 	
-	public void getAlgorithmData(NaiveBayes2 alg, String path){
-		this.rootPathLabel.setText(path);
+	public void getAlgorithmData(NaiveBayes2 alg){
+		this.rootPathLabel.setText(alg.getPath());
 		this.nDocumentsLabel.setText(alg.getnDocuments().toString());
 		this.nSpamDocsLabel.setText(alg.getnSpamDocuments().toString());
 		this.nHamDocsLabel.setText(alg.getnHamDocuments().toString());
