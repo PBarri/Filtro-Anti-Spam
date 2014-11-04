@@ -1,6 +1,6 @@
 package exceptions;
 
-public class InvalidPathException extends RuntimeException {
+public class InvalidPathException extends Exception {
 
 	/**
 	 * 

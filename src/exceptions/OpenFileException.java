@@ -2,7 +2,7 @@ package exceptions;
 
 import java.io.File;
 
-public class OpenFileException extends RuntimeException {
+public class OpenFileException extends Exception {
 	
 	/**
 	 * 

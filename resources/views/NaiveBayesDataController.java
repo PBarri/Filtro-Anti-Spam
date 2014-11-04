@@ -9,7 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import model.Probability;
-import algorithms.NaiveBayes2;
+import algorithms.NaiveBayes;
 import application.MainApplication;
 
 public class NaiveBayesDataController {
@@ -41,6 +41,12 @@ public class NaiveBayesDataController {
 	@FXML
 	private Label wordsAnalizedLabel;
 	
+	@FXML
+	private Label initSpamProb;
+	
+	@FXML
+	private Label initHamProb;
+	
 	private MainApplication mainApp;
 	
 	public NaiveBayesDataController(){
@@ -62,7 +68,7 @@ public class NaiveBayesDataController {
 		this.mainApp = app;
 	}
 	
-	public void getProbabilities(NaiveBayes2 alg, ObservableList<Probability> ol){
+	public void getProbabilities(NaiveBayes alg, ObservableList<Probability> ol){
 		String word, spamP, hamP;
 		Float probSpam, probHam;
 		for(Entry<String, List<Float>> entry : alg.getProbabilities().entrySet()){
@@ -77,12 +83,14 @@ public class NaiveBayesDataController {
 		table.setItems(ol);
 	}
 	
-	public void getAlgorithmData(NaiveBayes2 alg){
+	public void getAlgorithmData(NaiveBayes alg){
 		this.rootPathLabel.setText(alg.getPath());
 		this.nDocumentsLabel.setText(alg.getnDocuments().toString());
 		this.nSpamDocsLabel.setText(alg.getnSpamDocuments().toString());
 		this.nHamDocsLabel.setText(alg.getnHamDocuments().toString());
 		this.wordsAnalizedLabel.setText(alg.getTotalWords().toString());
+		this.initSpamProb.setText(alg.getInitSpamProb().toString());
+		this.initHamProb.setText(alg.getInitHamProb().toString());
 	}
 	
 }

@@ -10,7 +10,9 @@ import javafx.stage.DirectoryChooser;
 
 import org.controlsfx.dialog.Dialogs;
 
-import algorithms.NaiveBayes2;
+import exceptions.InvalidPathException;
+import exceptions.OpenFileException;
+import algorithms.NaiveBayes;
 import application.MainApplication;
 
 @SuppressWarnings("deprecation")
@@ -78,14 +80,22 @@ public class MainApplicationController {
 		if(file != null){
 			trainPath.setText(file.getAbsolutePath());
 		}else{
-			Dialogs.create().title("Error").masthead("Directorio erróneo").message("Se ha producido un error al abrir el directorio");
+			Dialogs.create().title("Error").masthead("Directorio erróneo").message("Se ha producido un error al abrir el directorio").showError();
 		}
 	}
 	
 	@FXML
 	private void train(){
-		NaiveBayes2 alg = new NaiveBayes2();
-		alg.train(trainPath.getText());
+		NaiveBayes alg = new NaiveBayes();
+		try {
+			alg.train(trainPath.getText());
+		} catch (NullPointerException e) {
+			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
+		} catch (InvalidPathException e) {
+			Dialogs.create().title("Error").masthead("Ruta inválida").message(e.getMessage()).showError();
+		} catch (OpenFileException e) {
+			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
+		}
 		this.mainApp.setAlg(alg);
 		this.mainApp.showNaiveBayesData();
 	}

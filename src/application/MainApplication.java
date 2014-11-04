@@ -13,13 +13,13 @@ import javafx.stage.Stage;
 import model.Probability;
 import views.MainApplicationController;
 import views.NaiveBayesDataController;
-import algorithms.NaiveBayes2;
+import algorithms.NaiveBayes;
 
 public class MainApplication extends Application {
 
 	private Stage primaryStage;
 	private BorderPane mainWindow;
-	private NaiveBayes2 alg;
+	private NaiveBayes alg;
 	// Lista para ver las probabilidades
 	private ObservableList<Probability> probabilitiesData = FXCollections.observableArrayList();
 	
@@ -31,11 +31,11 @@ public class MainApplication extends Application {
 		this.mainWindow = mainWindow;
 	}
 
-	public NaiveBayes2 getAlg() {
+	public NaiveBayes getAlg() {
 		return alg;
 	}
 
-	public void setAlg(NaiveBayes2 alg) {
+	public void setAlg(NaiveBayes alg) {
 		this.alg = alg;
 	}
 
@@ -52,7 +52,7 @@ public class MainApplication extends Application {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Filtro Anti Spam");
 		
-		this.alg = new NaiveBayes2();
+		this.alg = new NaiveBayes();
 		
 		initMainWindow();
 		//showNaiveBayesData();
