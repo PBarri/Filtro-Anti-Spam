@@ -1,4 +1,4 @@
-package views;
+package controllers;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -47,7 +47,7 @@ public class NaiveBayesDataController {
 	@FXML
 	private Label initHamProb;
 	
-	private MainApplication mainApp;
+	private MainApplication mainApplication;
 	
 	public NaiveBayesDataController(){
 		
@@ -61,11 +61,11 @@ public class NaiveBayesDataController {
 	}
 	
 	public MainApplication getMainApplication(){
-		return mainApp;
+		return mainApplication;
 	}
 	
-	public void setMainApplication(MainApplication app){
-		this.mainApp = app;
+	public void setMainApplication(MainApplication application){
+		this.mainApplication = application;
 	}
 	
 	public void getProbabilities(NaiveBayes alg, ObservableList<Probability> ol){

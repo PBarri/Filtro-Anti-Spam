@@ -11,9 +11,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Probability;
-import views.MainApplicationController;
-import views.NaiveBayesDataController;
 import algorithms.NaiveBayes;
+import controllers.HomeController;
+import controllers.MainApplicationController;
+import controllers.NaiveBayesDataController;
 
 public class MainApplication extends Application {
 
@@ -52,10 +53,8 @@ public class MainApplication extends Application {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Filtro Anti Spam");
 		
-		this.alg = new NaiveBayes();
-		
 		initMainWindow();
-		//showNaiveBayesData();
+		showHome();
 	}
 
 	public void initMainWindow() {
@@ -66,7 +65,7 @@ public class MainApplication extends Application {
 			mainWindow = (BorderPane) loader.load();
 			
 			MainApplicationController controller = loader.getController();
-			controller.setMainApp(this);
+			controller.setMainApplication(this);
 			
 			Scene scene = new Scene(mainWindow);
 			primaryStage.setScene(scene);
@@ -91,6 +90,23 @@ public class MainApplication extends Application {
 			controller.setMainApplication(this);
 			controller.getProbabilities(alg, probabilitiesData);
 			controller.getAlgorithmData(alg);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void showHome(){
+		try{
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApplication.class.getResource("/views/Home.fxml"));
+			AnchorPane home = (AnchorPane) loader.load();
+			
+			mainWindow.setCenter(home);
+			
+			this.alg = new NaiveBayes();
+			HomeController controller = loader.getController();
+			controller.setMainApplication(this);
+			
 		}catch(IOException e){
 			e.printStackTrace();
 		}

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.MainApplicationController">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainApplicationController">
    <top>
       <MenuBar BorderPane.alignment="TOP_LEFT">
         <menus>
@@ -26,95 +26,4 @@
         </menus>
       </MenuBar>
    </top>
-   <center>
-      <GridPane alignment="CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vgap="10.0" BorderPane.alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <AnchorPane GridPane.rowIndex="2">
-               <children>
-                  <HBox alignment="CENTER" layoutX="105.0" layoutY="11.0" prefHeight="46.0" prefWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Button fx:id="train" alignment="CENTER" contentDisplay="CENTER" layoutX="105.0" layoutY="11.0" mnemonicParsing="false" onAction="#train" text="Entrenar">
-                           <opaqueInsets>
-                              <Insets bottom="25.0" top="25.0" />
-                           </opaqueInsets>
-                        </Button>
-                     </children>
-                  </HBox>
-               </children>
-               <GridPane.margin>
-                  <Insets />
-               </GridPane.margin>
-            </AnchorPane>
-            <AnchorPane GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <children>
-                  <HBox alignment="CENTER" layoutX="63.0" layoutY="-1.0" prefHeight="46.0" prefWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Button fx:id="predict" alignment="CENTER" contentDisplay="CENTER" layoutX="63.0" layoutY="-1.0" mnemonicParsing="false" text="Predecir" />
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
-            <AnchorPane>
-               <children>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="52.0" layoutY="18.0" prefHeight="48.0" prefWidth="275.0" text="ENTRENAMIENTO" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <font>
-                        <Font name="System Bold" size="20.0" />
-                     </font>
-                  </Label>
-               </children>
-            </AnchorPane>
-            <AnchorPane GridPane.columnIndex="1">
-               <children>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="78.0" layoutY="18.0" prefHeight="48.0" prefWidth="275.0" text="PREDICCIÓN" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <font>
-                        <Font name="System Bold" size="20.0" />
-                     </font>
-                  </Label>
-               </children>
-            </AnchorPane>
-            <AnchorPane fx:id="trainPane" GridPane.rowIndex="1">
-               <children>
-                  <HBox alignment="CENTER" prefHeight="46.0" prefWidth="276.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <TextField fx:id="trainPath" alignment="CENTER_RIGHT" editable="false" HBox.hgrow="ALWAYS">
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin>
-                        </TextField>
-                        <Button fx:id="loadTrainFile" mnemonicParsing="false" onAction="#load" text="Seleccionar carpeta..." />
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
-            <AnchorPane fx:id="predictPane" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <children>
-                  <HBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <TextField fx:id="predictPath" alignment="CENTER_RIGHT" editable="false" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="loadPredictFile" mnemonicParsing="false" text="Seleccionar carpeta..." />
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
-         </children>
-         <padding>
-            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
-         </padding>
-         <BorderPane.margin>
-            <Insets />
-         </BorderPane.margin>
-      </GridPane>
-   </center>
 </BorderPane>
