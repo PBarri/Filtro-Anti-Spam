@@ -395,8 +395,8 @@ public class NaiveBayes {
 						if(vocabulary.contains(s))
 						{
 							listaPalabras.add(s);
-							this.initSpamProb += probabilities.get(s).get(0);
-							this.initHamProb += probabilities.get(s).get(1);
+							this.initSpamProb += new Float (Math.log10(probabilities.get(s).get(0).doubleValue()));
+							this.initHamProb +=  new Float (Math.log10(probabilities.get(s).get(1).doubleValue()));
 						}
 					}
 					
