@@ -23,6 +23,8 @@ public class NaiveBayes {
 	private String path;
 	private Integer nDocuments;
 	private Integer totalWords;
+	//Contador de palabras sin repeticion
+	private Integer totalWordsSR;
 	private Integer nSpamDocuments;
 	private Integer nHamDocuments;
 	private Float initSpamProb;
@@ -30,7 +32,9 @@ public class NaiveBayes {
 	private Map<String, Integer> spamWords;
 	private Map<String, Integer> hamWords;
 	private Map<String, List<Float>> probabilities;
+	private Map<String,Integer> prior;
 	private Set<String> vocabulary;
+	
 	
 	// Para predicción
 	private String predictPath;
@@ -40,8 +44,10 @@ public class NaiveBayes {
 		this.probabilities = new HashMap<String, List<Float>>();
 		this.spamWords = new HashMap<String, Integer>();
 		this.hamWords = new HashMap<String, Integer>();
+		this.prior = new HashMap<String,Integer>();
 		this.vocabulary = new HashSet<String>();
 		this.totalWords = 0;
+		this.totalWordsSR=0;
 		this.nDocuments = 0;
 		this.nSpamDocuments = 0;
 		this.nHamDocuments = 0;
@@ -74,6 +80,17 @@ public class NaiveBayes {
 
 	public void setTotalWords(Integer totalWords) {
 		this.totalWords = totalWords;
+	}
+	
+	public Integer getTotalWordsSR()
+	{
+		return totalWordsSR;
+	}
+	
+	public void setTotalWordsSR(Integer totalWordsSR)
+	{
+		
+		this.totalWordsSR=totalWordsSR;
 	}
 
 	public Integer getnSpamDocuments() {
@@ -170,6 +187,12 @@ public class NaiveBayes {
 	public void train(String path) throws NullPointerException, InvalidPathException, OpenFileException{
 		this.path = path;
 		this.train();
+		
+		//Estas 4 lineas siguientes corresponde al array prior que debe devolver el entrenamiento, no se si al unir los archivos lo borraste
+		Integer auxSpam = nSpamDocuments / nDocuments;
+		Integer auxham = nHamDocuments / nDocuments;
+		prior.put("spam", auxSpam);
+		prior.put("ham", auxham);
 	}
 	
 	public void train() throws NullPointerException, InvalidPathException, OpenFileException {
@@ -192,11 +215,22 @@ public class NaiveBayes {
 				nSpamDocuments++;
 				for(String s : fileWords){
 					spamWords.put(s, spamWords.getOrDefault(s, 0) + 1);
+					
+					if(!spamWords.containsKey(s))
+					{
+						totalWordsSR++;
+						
+					}
 				}
 			} else if (f.getParentFile().getName().equals(HAM)) {
 				nHamDocuments++;
 				for(String s : fileWords){
 					hamWords.put(s, hamWords.getOrDefault(s, 0) + 1);
+					
+					if(!hamWords.containsKey(s))
+					{
+						totalWordsSR++;
+					}
 				}
 			}
 		}
@@ -300,17 +334,15 @@ public class NaiveBayes {
 		
 		//Posible fallo:  en el algoritmo del PDF , en el punto 2.4 , especifica La division de T_-tc ("ocurrencias de t en texto_c " en teoria esta bien , aunque te piden los textos concatenados por
 		//categoria , tenemos diferenciados dos mapas asiq es como si ya estuvieran contadod.) pero a ese T_-tc se le suma "1" . Esto si habria que añadirlo no ? , que no lo veo
+		// Este cambio lo he hecho ya . Pero lo revisamos, te dejo señalado con AQUI donde he cambiado
 		
-		//Posible segundo fallo , pero aqui no estoy tan seguro: lo anterior dividido entre todos los "T_sc +1" , aqui entiendo  sumatorio de ("numero de apariciones de una palabra" + 1) , y esto ultimo
-		//por cada palabra y luego haces el sumatorio.
-		//Si te fija en el que esta echo, divide por numero Total palabras + contador palabras (sin tener en cuenta las repeticiones)
 		
 		
 		// Se recorren los mapas para calcular las probabilidades
 		for (Entry<String, Integer> entry : spamWords.entrySet()) {
 			List<Float> aux = new ArrayList<Float>();
 			// Calculamos la probabilidad de que la palabra sea spam
-			prob = entry.getValue().floatValue() / totalWords;
+			prob = (entry.getValue().floatValue() +1)/ (totalWords + totalWordsSR); //AQUI , el denominador tambien he cambiado , en el algoritmo y los otros lo tienen asi.(preguntame y te cuento)
 			aux.add(0, prob);
 			// Añadimos una probabilidad 0 de que no sea spam (por si no aparece
 			// en el otro mapa)
@@ -321,7 +353,7 @@ public class NaiveBayes {
 		for (Entry<String, Integer> entry : hamWords.entrySet()) {
 			List<Float> aux = new ArrayList<Float>();
 			// Calculamos la probabilidad de que la palabra sea ham
-			prob = entry.getValue().floatValue() / totalWords;
+			prob = entry.getValue().floatValue() / (totalWords + totalWordsSR);//AQUI , el denominador tambien he cambiado , en el algoritmo y los otros lo tienen asi.
 			// Apareció en el mapa de palabras spam
 			if (result.containsKey(entry.getKey())) {
 				aux = result.get(entry.getKey());
