@@ -402,11 +402,18 @@ public class NaiveBayes {
 					
 					
 					if(this.initSpamProb>this.initHamProb)
-						return "spam";
+						if(file.getParentFile().getName().equals(this.SPAM))
+							return "Spam Clasificado correctamente";
+						else
+							return "Spam Clasificado incorrectamente como HAM";
+					
 					if(this.initHamProb>this.initSpamProb)
-						return "ham";
+						if(file.getParentFile().getName().equals(this.HAM))
+							return "Ham Clasificado Correctamente";
+						else
+							return "Ham Clasificado incorrectamente como SPAM";
 					else
-						return "iguales";
+						return "Ninguna categoría prevalece y por tanto clasificado incorrectamente";
 		
 		} catch (IOException e) {
 			throw new OpenFileException(file);
