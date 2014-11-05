@@ -2,6 +2,7 @@ package application;
 
 import java.io.IOException;
 
+import model.Probability;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import model.Probability;
 import algorithms.NaiveBayes;
 import controllers.HomeController;
 import controllers.MainApplicationController;

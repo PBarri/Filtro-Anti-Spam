@@ -265,13 +265,14 @@ public class NaiveBayes {
 	private String[] loadWords(File file) throws OpenFileException {
 		try {
 			// Pasamos a una cadena de texto el correo
-			FileReader fr = new FileReader(file);
+			/*String str = FileUtils.readFileToString(file);*/ //-->> Idea : Vendria a sustituir las 4 lineas siguiente.
+			FileReader fr = new FileReader(file); 
 			char[] chars = new char[(int) file.length()];
 			fr.read(chars);
 			String content = new String(chars);
 			fr.close();
 			content.toLowerCase();
-			String[] fileWords = content.split("([^a-zA-Z0-9])+");
+			String[] fileWords = content.split("([^a-zA-Z0-9])+");   //--> Esta bien asi pero , si justo antes se pasa a minusculas, para que poner en la expresion las mayusculas?
 			
 			return fileWords;
 			
@@ -297,7 +298,14 @@ public class NaiveBayes {
 		Map<String, List<Float>> result = new HashMap<String, List<Float>>();
 		Float prob = new Float(0.0);
 		
-
+		//Posible fallo:  en el algoritmo del PDF , en el punto 2.4 , especifica La division de T_-tc ("ocurrencias de t en texto_c " en teoria esta bien , aunque te piden los textos concatenados por
+		//categoria , tenemos diferenciados dos mapas asiq es como si ya estuvieran contadod.) pero a ese T_-tc se le suma "1" . Esto si habria que añadirlo no ? , que no lo veo
+		
+		//Posible segundo fallo , pero aqui no estoy tan seguro: lo anterior dividido entre todos los "T_sc +1" , aqui entiendo  sumatorio de ("numero de apariciones de una palabra" + 1) , y esto ultimo
+		//por cada palabra y luego haces el sumatorio.
+		//Si te fija en el que esta echo, divide por numero Total palabras + contador palabras (sin tener en cuenta las repeticiones)
+		
+		
 		// Se recorren los mapas para calcular las probabilidades
 		for (Entry<String, Integer> entry : spamWords.entrySet()) {
 			List<Float> aux = new ArrayList<Float>();
@@ -326,6 +334,8 @@ public class NaiveBayes {
 			result.put(entry.getKey(), aux);
 		}
 		
+		
+		//Esto siguiente no deberia aparecer, pues lo que es el calculo del log , se hace ya en "clasifica" que es el clasificar un nuevo correo con el entrenamiento ya echo.
 		this.initSpamProb = new Float(Math.log10(nSpamDocuments.doubleValue() / nDocuments));
 		this.initHamProb = new Float(Math.log10(nHamDocuments.doubleValue() / nDocuments));
 		
