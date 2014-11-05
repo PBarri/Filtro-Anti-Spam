@@ -4,7 +4,7 @@ Trabajo para la asignatura IA2 consistente en crear un filtro anti spam para cla
 
 ## Instalación
 
-- Es necesario disponer de Java 8.
+- Es necesario disponer de Java 8, mínimo versión 20: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 - Instalación de e(fx)clipse:
   - Help -> Install new software..
   - En Location: http://download.eclipse.org/efxclipse/updates-released/1.0.0/site
