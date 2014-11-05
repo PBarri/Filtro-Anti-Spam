@@ -244,7 +244,10 @@ public class NaiveBayes {
 				iterateDirectories(f, filesToAnalize);
 			}
 		} else { // Si es un archivo se manda a una función para que sea analizado
-			filesToAnalize.add(file);
+			// Comprobamos que los archivos están dentro de las carpetas spam o ham
+			if(file.getParentFile().getName().toLowerCase().matches("spam|ham")){
+				filesToAnalize.add(file);
+			}
 		}
 	}
 
