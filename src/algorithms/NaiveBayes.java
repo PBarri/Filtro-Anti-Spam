@@ -374,5 +374,36 @@ public class NaiveBayes {
 		return result;
 		
 	}
+	
+	public String clasificaCorreo(File file) throws OpenFileException 
+	{
+				Set<String> listaPalabras   = new HashSet<String>();
+				
+			try{
+					
+					
+					FileReader fr = new FileReader(file); 
+					char[] chars = new char[(int) file.length()];
+					fr.read(chars);
+					String content = new String(chars);
+					fr.close();
+					content.toLowerCase();
+					String[] fileWords = content.split("([^a-zA-Z0-9])+");  
+					
+					for(String s : fileWords){
+						
+						if(vocabulary.contains(s))
+						{
+							listaPalabras.add(s);
+							
+						}
+					}
+					return "s";
+		
+		} catch (IOException e) {
+			throw new OpenFileException(file);
+		}
+		
+	}
 
 }
