@@ -14,6 +14,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="Archivo">
             <items>
+                  <MenuItem mnemonicParsing="false" onAction="#home" text="Inicio" />
               <MenuItem mnemonicParsing="false" onAction="#close" text="Cerrar" />
             </items>
           </Menu>
