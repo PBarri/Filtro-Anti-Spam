@@ -395,10 +395,18 @@ public class NaiveBayes {
 						if(vocabulary.contains(s))
 						{
 							listaPalabras.add(s);
-							
+							this.initSpamProb += probabilities.get(s).get(0);
+							this.initHamProb += probabilities.get(s).get(1);
 						}
 					}
-					return "s";
+					
+					
+					if(this.initSpamProb>this.initHamProb)
+						return "spam";
+					if(this.initHamProb>this.initSpamProb)
+						return "ham";
+					else
+						return "iguales";
 		
 		} catch (IOException e) {
 			throw new OpenFileException(file);
