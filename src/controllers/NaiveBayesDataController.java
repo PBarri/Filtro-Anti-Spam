@@ -3,6 +3,7 @@ package controllers;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -14,6 +15,11 @@ import application.MainApplication;
 
 public class NaiveBayesDataController {
 
+	private MainApplication mainApplication;
+	
+	// Lista para ver las probabilidades
+	private ObservableList<Probability> probabilitiesData = FXCollections.observableArrayList();
+	
 	@FXML
 	private TableView<Probability> table;
 	
@@ -47,8 +53,6 @@ public class NaiveBayesDataController {
 	@FXML
 	private Label initHamProb;
 	
-	private MainApplication mainApplication;
-	
 	public NaiveBayesDataController(){
 		
 	}
@@ -68,7 +72,7 @@ public class NaiveBayesDataController {
 		this.mainApplication = application;
 	}
 	
-	public void getProbabilities(NaiveBayes alg, ObservableList<Probability> ol){
+	public void getProbabilities(NaiveBayes alg){
 		String word, spamP, hamP;
 		Float probSpam, probHam;
 		for(Entry<String, List<Float>> entry : alg.getProbabilities().entrySet()){
@@ -78,9 +82,9 @@ public class NaiveBayesDataController {
 			spamP = probSpam.toString();
 			hamP = probHam.toString();
 			Probability p = new Probability(word, spamP, hamP);
-			ol.add(p);
+			probabilitiesData.add(p);
 		}
-		table.setItems(ol);
+		table.setItems(probabilitiesData);
 	}
 	
 	public void getAlgorithmData(NaiveBayes alg){

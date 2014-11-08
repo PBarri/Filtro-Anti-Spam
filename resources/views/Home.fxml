@@ -30,7 +30,7 @@
                <children>
                   <HBox alignment="CENTER" layoutX="63.0" layoutY="-1.0" prefHeight="46.0" prefWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Button fx:id="predict" alignment="CENTER" contentDisplay="CENTER" layoutX="63.0" layoutY="-1.0" mnemonicParsing="false" text="Predecir" />
+                        <Button fx:id="predict" alignment="CENTER" contentDisplay="CENTER" layoutX="63.0" layoutY="-1.0" mnemonicParsing="false" onAction="#predict" text="Predecir" />
                      </children>
                   </HBox>
                </children>
@@ -72,7 +72,7 @@
                   <HBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <TextField fx:id="predictPath" alignment="CENTER_RIGHT" editable="false" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="loadPredictFile" mnemonicParsing="false" text="Seleccionar carpeta..." />
+                        <Button fx:id="loadPredictFile" mnemonicParsing="false" onAction="#loadPredictionsFile" text="Seleccionar carpeta..." />
                      </children>
                   </HBox>
                </children>

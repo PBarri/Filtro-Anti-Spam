@@ -12,6 +12,7 @@ import org.controlsfx.dialog.Dialogs;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 import exceptions.InvalidPathException;
+import exceptions.NotTrainedException;
 import exceptions.OpenFileException;
 
 @SuppressWarnings("deprecation")
@@ -66,7 +67,7 @@ public class HomeController {
 	
 	@FXML
 	private void train(){
-		NaiveBayes alg = new NaiveBayes();
+		NaiveBayes alg = mainApplication.getAlg();
 		try {
 			alg.train(trainPath.getText());
 		} catch (NullPointerException e) {
@@ -78,6 +79,35 @@ public class HomeController {
 		}
 		this.mainApplication.setAlg(alg);
 		this.mainApplication.showNaiveBayesData();
+	}
+	
+	@FXML
+	private void loadPredictionsFile(){
+		DirectoryChooser chooser = new DirectoryChooser();
+		chooser.setTitle("Escoge un archivo o directorio");
+		File initialFile = new File(System.getProperty("user.home"));
+		chooser.setInitialDirectory(initialFile);
+		
+		File file = chooser.showDialog(mainApplication.getPrimaryStage());
+		if(file != null){
+			predictPath.setText(file.getAbsolutePath());
+		}else{
+			Dialogs.create().title("Error").masthead("Archivo erróneo").message("Se ha producido un error al abrir el directorio o archivo").showError();
+		}
+	}
+	
+	@FXML
+	private void predict(){
+		NaiveBayes alg = mainApplication.getAlg();
+		try {
+			alg.predict(predictPath.getText());
+		} catch (OpenFileException e) {
+			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
+		} catch (NotTrainedException e) {
+			Dialogs.create().title("Error").masthead("Entrenamiento erróneo").message("Debe entrenar un conjunto de correos antes de clasificar").showError();
+		}
+		this.mainApplication.setAlg(alg);
+		this.mainApplication.showPredictions();
 	}
 
 }

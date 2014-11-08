@@ -3,6 +3,7 @@ package algorithms;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +12,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.google.common.io.Files;
+
 import exceptions.InvalidPathException;
+import exceptions.NotTrainedException;
 import exceptions.OpenFileException;
 
 public class NaiveBayes {
@@ -32,18 +36,21 @@ public class NaiveBayes {
 	private Map<String, Integer> spamWords;
 	private Map<String, Integer> hamWords;
 	private Map<String, List<Float>> probabilities;
-	private Map<String,Integer> prior;
 	private Set<String> vocabulary;
 	
 	
 	// Para predicción
 	private Map<String, List<Float>> predictResults;
+	private Integer nPredictDocuments;
+	private Integer nPredictSpamDocuments;
+	private Integer nPredictHamDocuments;
+	private Integer wellAnalized;
+	private Integer badAnalized;
 
 	public NaiveBayes() {
 		this.probabilities = new HashMap<String, List<Float>>();
 		this.spamWords = new HashMap<String, Integer>();
 		this.hamWords = new HashMap<String, Integer>();
-		this.prior = new HashMap<String,Integer>();
 		this.vocabulary = new HashSet<String>();
 		this.totalWords = 0;
 		this.totalWordsSR=0;
@@ -57,6 +64,11 @@ public class NaiveBayes {
 		// [2] -> Clasificación algoritmo {1 -> Spam, 2 -> Ham, 0 -> Error clasificación}, 
 		// [3] -> Clasificación real {1 -> Spam, 2 -> Ham}
 		this.predictResults = new HashMap<String, List<Float>>();
+		this.nPredictDocuments = 0;
+		this.nPredictSpamDocuments = 0;
+		this.nPredictHamDocuments = 0;
+		this.wellAnalized = 0;
+		this.badAnalized = 0;
 	}
 
 	public String getPath() {
@@ -166,6 +178,46 @@ public class NaiveBayes {
 		this.predictResults = predictResults;
 	}
 
+	public Integer getnPredictDocuments() {
+		return nPredictDocuments;
+	}
+
+	public void setnPredictDocuments(Integer nPredictDocuments) {
+		this.nPredictDocuments = nPredictDocuments;
+	}
+
+	public Integer getnPredictSpamDocuments() {
+		return nPredictSpamDocuments;
+	}
+
+	public void setnPredictSpamDocuments(Integer nPredictSpamDocuments) {
+		this.nPredictSpamDocuments = nPredictSpamDocuments;
+	}
+
+	public Integer getnPredictHamDocuments() {
+		return nPredictHamDocuments;
+	}
+
+	public void setnPredictHamDocuments(Integer nPredictHamDocuments) {
+		this.nPredictHamDocuments = nPredictHamDocuments;
+	}
+
+	public Integer getWellAnalized() {
+		return wellAnalized;
+	}
+
+	public void setWellAnalized(Integer wellAnalized) {
+		this.wellAnalized = wellAnalized;
+	}
+
+	public Integer getBadAnalized() {
+		return badAnalized;
+	}
+
+	public void setBadAnalized(Integer badAnalized) {
+		this.badAnalized = badAnalized;
+	}
+
 	/**
 	 * Método para cargar los correos de entrenamiento
 	 * 
@@ -231,9 +283,11 @@ public class NaiveBayes {
 
 	}
 	
-	public void predict(String path) throws OpenFileException{
+	public void predict(String path) throws OpenFileException, NotTrainedException{
 		File file = new File(path);
 		List<File> filesToAnalize = new ArrayList<File>();
+		// Vaciamos los resultados previos
+		predictResults.clear();
 		if(file.isDirectory()){
 			iterateDirectories(file, filesToAnalize);
 			for(File f : filesToAnalize){
@@ -244,7 +298,11 @@ public class NaiveBayes {
 		}
 	}
 	
-	public void predict(File file) throws OpenFileException {
+	public void predict(File file) throws OpenFileException, NotTrainedException {
+		
+		// Comprobamos que el Mapa de probabilidades contiene datos
+		if(probabilities.isEmpty())
+			throw new NotTrainedException();
 		
 		Float totalSpamProb = this.initSpamProb;
 		Float totalHamProb = this.initHamProb;
@@ -275,9 +333,17 @@ public class NaiveBayes {
 			break;
 		}
 		if(file.getParentFile().getName().equals(SPAM)){
+			this.nPredictSpamDocuments++;
 			results.add(new Float(1));
 		}else if(file.getParentFile().getName().equals(HAM)){
+			this.nPredictHamDocuments++;
 			results.add(new Float(2));
+		}
+		
+		if(results.get(2).equals(results.get(3))){
+			wellAnalized++;
+		}else{
+			badAnalized++;
 		}
 		predictResults.put(file.getName(), results);
 	}
@@ -318,21 +384,14 @@ public class NaiveBayes {
 	private String[] loadWords(File file) throws OpenFileException {
 		try {
 			// Pasamos a una cadena de texto el correo
-			/*String str = FileUtils.readFileToString(file);*/ //-->> Idea : Vendria a sustituir las 4 lineas siguiente.
-			FileReader fr = new FileReader(file); 
-			char[] chars = new char[(int) file.length()];
-			fr.read(chars);
-			String content = new String(chars);
-			fr.close();
+			String content = Files.toString(file, Charset.defaultCharset());
 			content.toLowerCase();
-			String[] fileWords = content.split("([^a-zA-Z0-9])+");   //--> Esta bien asi pero , si justo antes se pasa a minusculas, para que poner en la expresion las mayusculas?
+			String[] fileWords = content.split("([^a-z0-9])+");
 			
-			return fileWords;
-			
+			return fileWords;			
 		} catch (IOException e) {
 			throw new OpenFileException(file);
 		}
-
 	}
 
 	/**

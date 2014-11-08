@@ -41,6 +41,11 @@ public class MainApplicationController {
 	
 	@FXML
 	private void home(){
-		this.mainApplication.showHome();
+		this.mainApplication.showHome(false);
+	}
+	
+	@FXML
+	private void newTraining(){
+		this.mainApplication.showHome(true);
 	}
 }

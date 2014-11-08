@@ -2,10 +2,7 @@ package application;
 
 import java.io.IOException;
 
-import model.Probability;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
@@ -15,14 +12,13 @@ import algorithms.NaiveBayes;
 import controllers.HomeController;
 import controllers.MainApplicationController;
 import controllers.NaiveBayesDataController;
+import controllers.PredictionDataController;
 
 public class MainApplication extends Application {
 
 	private Stage primaryStage;
 	private BorderPane mainWindow;
 	private NaiveBayes alg;
-	// Lista para ver las probabilidades
-	private ObservableList<Probability> probabilitiesData = FXCollections.observableArrayList();
 	
 	public BorderPane getMainWindow() {
 		return mainWindow;
@@ -40,21 +36,13 @@ public class MainApplication extends Application {
 		this.alg = alg;
 	}
 
-	public void setProbabilitiesData(ObservableList<Probability> probabilitiesData) {
-		this.probabilitiesData = probabilitiesData;
-	}
-
-	public ObservableList<Probability> getProbabilitiesData() {
-		return probabilitiesData;
-	}
-
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Filtro Anti Spam");
 		
 		initMainWindow();
-		showHome();
+		showHome(true);
 	}
 
 	public void initMainWindow() {
@@ -88,14 +76,14 @@ public class MainApplication extends Application {
 			NaiveBayesDataController controller = loader.getController();
 			
 			controller.setMainApplication(this);
-			controller.getProbabilities(alg, probabilitiesData);
+			controller.getProbabilities(alg);
 			controller.getAlgorithmData(alg);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public void showHome(){
+	public void showHome(Boolean init){
 		try{
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApplication.class.getResource("/views/Home.fxml"));
@@ -103,10 +91,28 @@ public class MainApplication extends Application {
 			
 			mainWindow.setCenter(home);
 			
-			this.alg = new NaiveBayes();
+			if(init)
+				this.alg = new NaiveBayes();
+			
 			HomeController controller = loader.getController();
 			controller.setMainApplication(this);
 			
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void showPredictions(){
+		try{
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApplication.class.getResource("/views/PredictionsData.fxml"));
+			AnchorPane predictionData = (AnchorPane) loader.load();
+			
+			mainWindow.setCenter(predictionData);
+			
+			PredictionDataController controller = loader.getController();
+			controller.setMainApplication(this);
+			controller.getPredictionsData(alg);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
