@@ -37,8 +37,7 @@ public class NaiveBayes {
 	
 	
 	// Para predicción
-	private String predictPath;
-	private List<Float> predictResults;
+	private Map<String, List<Float>> predictResults;
 
 	public NaiveBayes() {
 		this.probabilities = new HashMap<String, List<Float>>();
@@ -54,8 +53,10 @@ public class NaiveBayes {
 		this.initSpamProb = new Float(0.0);
 		this.initHamProb = new Float(0.0);
 		this.path = "";
-		this.predictPath = "";
-		this.predictResults = new ArrayList<Float>();
+		// List<Float> ==> [0] -> Probabilidad SPAM, [1] -> Probabilidad HAM, 
+		// [2] -> Clasificación algoritmo {1 -> Spam, 2 -> Ham, 0 -> Error clasificación}, 
+		// [3] -> Clasificación real {1 -> Spam, 2 -> Ham}
+		this.predictResults = new HashMap<String, List<Float>>();
 	}
 
 	public String getPath() {
@@ -157,21 +158,11 @@ public class NaiveBayes {
 		this.vocabulary = vocabulary;
 	}
 
-
-
-	public String getPredictPath() {
-		return predictPath;
-	}
-
-	public void setPredictPath(String predictPath) {
-		this.predictPath = predictPath;
-	}
-
-	public List<Float> getPredictResults() {
+	public Map<String, List<Float>> getPredictResults() {
 		return predictResults;
 	}
 
-	public void setPredictResults(List<Float> predictResults) {
+	public void setPredictResults(Map<String, List<Float>> predictResults) {
 		this.predictResults = predictResults;
 	}
 
@@ -188,11 +179,11 @@ public class NaiveBayes {
 		this.path = path;
 		this.train();
 		
-		//Estas 4 lineas siguientes corresponde al array prior que debe devolver el entrenamiento, no se si al unir los archivos lo borraste
-		Integer auxSpam = nSpamDocuments / nDocuments;
-		Integer auxham = nHamDocuments / nDocuments;
-		prior.put("spam", auxSpam);
-		prior.put("ham", auxham);
+//		//Estas 4 lineas siguientes corresponde al array prior que debe devolver el entrenamiento, no se si al unir los archivos lo borraste
+//		Integer auxSpam = nSpamDocuments / nDocuments;
+//		Integer auxham = nHamDocuments / nDocuments;
+//		prior.put("spam", auxSpam);
+//		prior.put("ham", auxham);
 	}
 	
 	public void train() throws NullPointerException, InvalidPathException, OpenFileException {
@@ -241,26 +232,54 @@ public class NaiveBayes {
 	}
 	
 	public void predict(String path) throws OpenFileException{
-		this.predictPath = path;
-		this.predict();
+		File file = new File(path);
+		List<File> filesToAnalize = new ArrayList<File>();
+		if(file.isDirectory()){
+			iterateDirectories(file, filesToAnalize);
+			for(File f : filesToAnalize){
+				this.predict(f);
+			}
+		}else{
+			this.predict(file);
+		}
 	}
 	
-	public void predict() throws OpenFileException {
+	public void predict(File file) throws OpenFileException {
 		
-		File file = new File(predictPath);
 		Float totalSpamProb = this.initSpamProb;
 		Float totalHamProb = this.initHamProb;
-		Map<String, Integer> trainedWords = new HashMap<String, Integer>();
-		Map<String, Integer> untrainedWords = new HashMap<String, Integer>();
+		List<Float> results = new ArrayList<Float>();
+//		Map<String, Integer> trainedWords = new HashMap<String, Integer>();
+//		Map<String, Integer> untrainedWords = new HashMap<String, Integer>();
 		
-		// Comprobamos que es un fichero
-		if(file.isFile()){
-			String[] fileWords = loadWords(file);
-			for(String s : fileWords){
-				
+		String[] fileWords = loadWords(file);
+		for(String s : fileWords){
+			if(probabilities.containsKey(s)){
+				totalSpamProb += new Float (Math.log10(probabilities.get(s).get(0).doubleValue()));
+				totalHamProb += new Float (Math.log10(probabilities.get(s).get(1).doubleValue()));
+			}else{
+				// Aqui que tiene que haber ¿?
 			}
 		}
-
+		results.add(totalSpamProb);
+		results.add(totalHamProb);
+		switch(totalSpamProb.compareTo(totalHamProb)){
+		case 1: // Clasificado como SPAM
+			results.add(new Float(1));
+			break;
+		case 0: // Error al clasificar
+			results.add(new Float(0));
+			break;
+		case -1: // Clasificado como HAM
+			results.add(new Float(2));
+			break;
+		}
+		if(file.getParentFile().getName().equals(SPAM)){
+			results.add(new Float(1));
+		}else if(file.getParentFile().getName().equals(HAM)){
+			results.add(new Float(2));
+		}
+		predictResults.put(file.getName(), results);
 	}
 
 	/**
