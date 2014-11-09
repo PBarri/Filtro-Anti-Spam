@@ -1,5 +1,6 @@
 package controllers;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -67,6 +68,7 @@ public class PredictionDataController {
 		hamColumn.setCellValueFactory(cellData -> cellData.getValue().getHamProbability());
 		category.setCellValueFactory(cellData -> cellData.getValue().getCategory());
 		realCategory.setCellValueFactory(cellData -> cellData.getValue().getRealCategory());
+		predictionsData.clear();
 	}
 
 	public MainApplication getMainApplication() {
@@ -91,11 +93,12 @@ public class PredictionDataController {
 		table.setItems(predictionsData);
 		this.totalDocuments.setText(alg.getnPredictDocuments().toString());
 		this.spamDocuments.setText(alg.getnPredictSpamDocuments().toString());
-		this.hamColumn.setText(alg.getnPredictHamDocuments().toString());
+		this.hamDocuments.setText(alg.getnPredictHamDocuments().toString());
 		this.wellClasiffied.setText(alg.getWellAnalized().toString());
 		this.badClassified.setText(alg.getBadAnalized().toString());
 		Float percentage = (alg.getWellAnalized().floatValue() / alg.getnPredictDocuments()) * 100;
-		this.percentage.setText(percentage.toString());
+		DecimalFormat df = new DecimalFormat("#.##");
+		this.percentage.setText(df.format(percentage) + " %");
 	}
 
 }

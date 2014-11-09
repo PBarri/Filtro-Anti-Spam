@@ -1,7 +1,6 @@
 package algorithms;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -238,7 +237,7 @@ public class NaiveBayes {
 //		prior.put("ham", auxham);
 	}
 	
-	public void train() throws NullPointerException, InvalidPathException, OpenFileException {
+	private void train() throws NullPointerException, InvalidPathException, OpenFileException {
 
 		File file = new File(path);
 		List<File> filesToAnalize = new ArrayList<File>();
@@ -293,12 +292,14 @@ public class NaiveBayes {
 			for(File f : filesToAnalize){
 				this.predict(f);
 			}
+			this.nPredictDocuments = filesToAnalize.size();
 		}else{
+			this.nPredictDocuments = 1;
 			this.predict(file);
 		}
 	}
 	
-	public void predict(File file) throws OpenFileException, NotTrainedException {
+	private void predict(File file) throws OpenFileException, NotTrainedException {
 		
 		// Comprobamos que el Mapa de probabilidades contiene datos
 		if(probabilities.isEmpty())
@@ -313,8 +314,10 @@ public class NaiveBayes {
 		String[] fileWords = loadWords(file);
 		for(String s : fileWords){
 			if(probabilities.containsKey(s)){
-				totalSpamProb += new Float (Math.log10(probabilities.get(s).get(0).doubleValue()));
-				totalHamProb += new Float (Math.log10(probabilities.get(s).get(1).doubleValue()));
+				Float tempSpamProb = new Float(Math.log10(probabilities.get(s).get(0)));
+				Float tempHamProb = new Float(Math.log10(probabilities.get(s).get(1)));
+				totalSpamProb += tempSpamProb;
+				totalHamProb += tempHamProb;
 			}else{
 				// Aqui que tiene que haber ¿?
 			}
@@ -452,51 +455,4 @@ public class NaiveBayes {
 		return result;
 		
 	}
-	
-	public String clasificaCorreo(File file) throws OpenFileException 
-	{
-				Set<String> listaPalabras   = new HashSet<String>();
-				
-			try{
-					
-					
-					FileReader fr = new FileReader(file); 
-					char[] chars = new char[(int) file.length()];
-					fr.read(chars);
-					String content = new String(chars);
-					fr.close();
-					content.toLowerCase();
-					String[] fileWords = content.split("([^a-zA-Z0-9])+");  
-					
-					for(String s : fileWords){
-						
-						if(vocabulary.contains(s))
-						{
-							listaPalabras.add(s);
-							this.initSpamProb += new Float (Math.log10(probabilities.get(s).get(0).doubleValue()));
-							this.initHamProb +=  new Float (Math.log10(probabilities.get(s).get(1).doubleValue()));
-						}
-					}
-					
-					
-					if(this.initSpamProb>this.initHamProb)
-						if(file.getParentFile().getName().equals(this.SPAM))
-							return "Spam Clasificado correctamente";
-						else
-							return "Spam Clasificado incorrectamente como HAM";
-					
-					if(this.initHamProb>this.initSpamProb)
-						if(file.getParentFile().getName().equals(this.HAM))
-							return "Ham Clasificado Correctamente";
-						else
-							return "Ham Clasificado incorrectamente como SPAM";
-					else
-						return "Ninguna categoría prevalece y por tanto clasificado incorrectamente";
-		
-		} catch (IOException e) {
-			throw new OpenFileException(file);
-		}
-		
-	}
-
 }

@@ -62,6 +62,7 @@ public class NaiveBayesDataController {
 		wordColumn.setCellValueFactory(cellData -> cellData.getValue().getWord());
 		spamColumn.setCellValueFactory(cellData -> cellData.getValue().getSpamProbability());
 		hamColumn.setCellValueFactory(cellData -> cellData.getValue().getHamProbability());
+		probabilitiesData.clear();
 	}
 	
 	public MainApplication getMainApplication(){
