@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.File;
+import java.util.prefs.Preferences;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -52,16 +53,17 @@ public class HomeController {
 	
 	@FXML
 	private void load(){
+		Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+		String filePath = pref.get("trainDirectory", System.getProperty("user.home"));
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Escoge directorio inicial");
-		File initialFile = new File(System.getProperty("user.home"));
+		File initialFile = new File(filePath);
 		directoryChooser.setInitialDirectory(initialFile);
 		
 		File file = directoryChooser.showDialog(mainApplication.getPrimaryStage());
 		if(file != null){
 			trainPath.setText(file.getAbsolutePath());
-		}else{
-			Dialogs.create().title("Error").masthead("Directorio erróneo").message("Se ha producido un error al abrir el directorio").showError();
+			pref.put("trainDirectory", file.getAbsolutePath());
 		}
 	}
 	
@@ -83,16 +85,18 @@ public class HomeController {
 	
 	@FXML
 	private void loadPredictionsFile(){
+		Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+		String filePath = pref.get("predictDirectory", System.getProperty("user.home"));
 		DirectoryChooser chooser = new DirectoryChooser();
 		chooser.setTitle("Escoge un archivo o directorio");
-		File initialFile = new File(System.getProperty("user.home"));
+		File initialFile = new File(filePath);
 		chooser.setInitialDirectory(initialFile);
 		
 		File file = chooser.showDialog(mainApplication.getPrimaryStage());
+		
 		if(file != null){
 			predictPath.setText(file.getAbsolutePath());
-		}else{
-			Dialogs.create().title("Error").masthead("Archivo erróneo").message("Se ha producido un error al abrir el directorio o archivo").showError();
+			pref.put("predictDirectory", file.getAbsolutePath());
 		}
 	}
 	

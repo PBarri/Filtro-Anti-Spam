@@ -11,12 +11,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.google.common.io.Files;
 
 import exceptions.InvalidPathException;
 import exceptions.NotTrainedException;
 import exceptions.OpenFileException;
 
+@XmlRootElement(name = "NaiveBayes")
 public class NaiveBayes {
 	
 	private static final String SPAM = "spam";
@@ -24,17 +28,25 @@ public class NaiveBayes {
 
 	// Para entrenamiento
 	private String path;
+	@XmlElement(name = "totalDocuments")
 	private Integer nDocuments;
+	@XmlElement(name = "totalWords")
 	private Integer totalWords;
 	//Contador de palabras sin repeticion
 	private Integer totalWordsSR;
+	@XmlElement(name = "totalSpamDocuments")
 	private Integer nSpamDocuments;
+	@XmlElement(name = "totalHamDocuments")
 	private Integer nHamDocuments;
+	@XmlElement(name = "initialSpamProbability")
 	private Float initSpamProb;
+	@XmlElement(name = "initialHamProbability")
 	private Float initHamProb;
 	private Map<String, Integer> spamWords;
 	private Map<String, Integer> hamWords;
+	@XmlElement(name = "probabilities")
 	private Map<String, List<Float>> probabilities;
+	@XmlElement(name = "vocabulary")
 	private Set<String> vocabulary;
 	
 	
@@ -314,8 +326,8 @@ public class NaiveBayes {
 		String[] fileWords = loadWords(file);
 		for(String s : fileWords){
 			if(probabilities.containsKey(s)){
-				Float tempSpamProb = new Float(Math.log10(probabilities.get(s).get(0)));
-				Float tempHamProb = new Float(Math.log10(probabilities.get(s).get(1)));
+				Float tempSpamProb = Math.abs(new Float(Math.log10(probabilities.get(s).get(0))));
+				Float tempHamProb = Math.abs(new Float(Math.log10(probabilities.get(s).get(1))));
 				totalSpamProb += tempSpamProb;
 				totalHamProb += tempHamProb;
 			}else{
@@ -449,8 +461,8 @@ public class NaiveBayes {
 		
 		
 		//Esto siguiente no deberia aparecer, pues lo que es el calculo del log , se hace ya en "clasifica" que es el clasificar un nuevo correo con el entrenamiento ya echo.
-		this.initSpamProb = new Float(Math.log10(nSpamDocuments.doubleValue() / nDocuments));
-		this.initHamProb = new Float(Math.log10(nHamDocuments.doubleValue() / nDocuments));
+		this.initSpamProb = Math.abs(new Float(Math.log10(nSpamDocuments.doubleValue() / nDocuments)));
+		this.initHamProb = Math.abs(new Float(Math.log10(nHamDocuments.doubleValue() / nDocuments)));
 		
 		return result;
 		
