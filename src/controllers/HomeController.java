@@ -74,10 +74,13 @@ public class HomeController {
 			alg.train(trainPath.getText());
 		} catch (NullPointerException e) {
 			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
+			return;
 		} catch (InvalidPathException e) {
 			Dialogs.create().title("Error").masthead("Ruta inválida").message(e.getMessage()).showError();
+			return;
 		} catch (OpenFileException e) {
 			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
+			return;
 		}
 		this.mainApplication.setAlg(alg);
 		this.mainApplication.showNaiveBayesData();
@@ -107,8 +110,10 @@ public class HomeController {
 			alg.predict(predictPath.getText());
 		} catch (OpenFileException e) {
 			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
+			return;
 		} catch (NotTrainedException e) {
 			Dialogs.create().title("Error").masthead("Entrenamiento erróneo").message("Debe entrenar un conjunto de correos antes de clasificar").showError();
+			return;
 		}
 		this.mainApplication.setAlg(alg);
 		this.mainApplication.showPredictions();

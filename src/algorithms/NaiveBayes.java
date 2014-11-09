@@ -32,8 +32,6 @@ public class NaiveBayes {
 	private Integer nDocuments;
 	@XmlElement(name = "totalWords")
 	private Integer totalWords;
-	//Contador de palabras sin repeticion
-	private Integer totalWordsSR;
 	@XmlElement(name = "totalSpamDocuments")
 	private Integer nSpamDocuments;
 	@XmlElement(name = "totalHamDocuments")
@@ -46,7 +44,6 @@ public class NaiveBayes {
 	private Map<String, Integer> hamWords;
 	@XmlElement(name = "probabilities")
 	private Map<String, List<Float>> probabilities;
-	@XmlElement(name = "vocabulary")
 	private Set<String> vocabulary;
 	
 	
@@ -64,7 +61,6 @@ public class NaiveBayes {
 		this.hamWords = new HashMap<String, Integer>();
 		this.vocabulary = new HashSet<String>();
 		this.totalWords = 0;
-		this.totalWordsSR=0;
 		this.nDocuments = 0;
 		this.nSpamDocuments = 0;
 		this.nHamDocuments = 0;
@@ -104,17 +100,6 @@ public class NaiveBayes {
 
 	public void setTotalWords(Integer totalWords) {
 		this.totalWords = totalWords;
-	}
-	
-	public Integer getTotalWordsSR()
-	{
-		return totalWordsSR;
-	}
-	
-	public void setTotalWordsSR(Integer totalWordsSR)
-	{
-		
-		this.totalWordsSR=totalWordsSR;
 	}
 
 	public Integer getnSpamDocuments() {
@@ -253,7 +238,6 @@ public class NaiveBayes {
 
 		File file = new File(path);
 		List<File> filesToAnalize = new ArrayList<File>();
-
 		// Comprobamos que nos han pasado una ruta de una carpeta y no de un archivo
 		if (file.isDirectory()) {
 			iterateDirectories(file, filesToAnalize);
@@ -268,29 +252,23 @@ public class NaiveBayes {
 			if (f.getParentFile().getName().equals(SPAM)){
 				nSpamDocuments++;
 				for(String s : fileWords){
-					spamWords.put(s, spamWords.getOrDefault(s, 0) + 1);
-					
-					if(!spamWords.containsKey(s))
-					{
-						totalWordsSR++;
-						
+					if(!vocabulary.contains(s)){
+						vocabulary.add(s);
 					}
+					spamWords.put(s, spamWords.getOrDefault(s, 0) + 1);
 				}
 			} else if (f.getParentFile().getName().equals(HAM)) {
 				nHamDocuments++;
 				for(String s : fileWords){
-					hamWords.put(s, hamWords.getOrDefault(s, 0) + 1);
-					
-					if(!hamWords.containsKey(s))
-					{
-						totalWordsSR++;
+					if(!vocabulary.contains(s)){
+						vocabulary.add(s);
 					}
+					hamWords.put(s, hamWords.getOrDefault(s, 0) + 1);
 				}
 			}
 		}
 		
 		probabilities = generateProbabilities(spamWords, hamWords);
-		vocabulary = probabilities.keySet();
 
 	}
 	
@@ -429,13 +407,11 @@ public class NaiveBayes {
 		//categoria , tenemos diferenciados dos mapas asiq es como si ya estuvieran contadod.) pero a ese T_-tc se le suma "1" . Esto si habria que añadirlo no ? , que no lo veo
 		// Este cambio lo he hecho ya . Pero lo revisamos, te dejo señalado con AQUI donde he cambiado
 		
-		
-		
 		// Se recorren los mapas para calcular las probabilidades
 		for (Entry<String, Integer> entry : spamWords.entrySet()) {
 			List<Float> aux = new ArrayList<Float>();
 			// Calculamos la probabilidad de que la palabra sea spam
-			prob = (entry.getValue().floatValue() +1)/ (totalWords + totalWordsSR); //AQUI , el denominador tambien he cambiado , en el algoritmo y los otros lo tienen asi.(preguntame y te cuento)
+			prob = (entry.getValue().floatValue() +1)/ (totalWords + vocabulary.size()); //AQUI , el denominador tambien he cambiado , en el algoritmo y los otros lo tienen asi.(preguntame y te cuento)
 			aux.add(0, prob);
 			// Añadimos una probabilidad 0 de que no sea spam (por si no aparece
 			// en el otro mapa)
@@ -446,7 +422,7 @@ public class NaiveBayes {
 		for (Entry<String, Integer> entry : hamWords.entrySet()) {
 			List<Float> aux = new ArrayList<Float>();
 			// Calculamos la probabilidad de que la palabra sea ham
-			prob = entry.getValue().floatValue() / (totalWords + totalWordsSR);//AQUI , el denominador tambien he cambiado , en el algoritmo y los otros lo tienen asi.
+			prob = entry.getValue().floatValue() / (totalWords + vocabulary.size());//AQUI , el denominador tambien he cambiado , en el algoritmo y los otros lo tienen asi.
 			// Apareció en el mapa de palabras spam
 			if (result.containsKey(entry.getKey())) {
 				aux = result.get(entry.getKey());

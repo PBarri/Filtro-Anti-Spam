@@ -1,5 +1,6 @@
 package utilities;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,17 @@ public class Utils {
 			}
 		}
 		return result;
+	}
+	
+	public static String getPercentage(Number number, Number total){
+		DecimalFormat df = new DecimalFormat("#.##");
+		Float percentage;
+		if(total != null){
+			percentage = (number.floatValue() / total.floatValue()) * 100;
+		}else{
+			percentage = number.floatValue() * 100;
+		}		
+		return df.format(percentage) + " %";
 	}
 
 }

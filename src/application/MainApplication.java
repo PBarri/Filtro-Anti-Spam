@@ -1,5 +1,6 @@
 package application;
 
+import java.io.File;
 import java.io.IOException;
 
 import javafx.application.Application;
@@ -19,6 +20,7 @@ public class MainApplication extends Application {
 	private Stage primaryStage;
 	private BorderPane mainWindow;
 	private NaiveBayes alg;
+	private File filePath;
 	
 	public BorderPane getMainWindow() {
 		return mainWindow;
@@ -34,6 +36,14 @@ public class MainApplication extends Application {
 
 	public void setAlg(NaiveBayes alg) {
 		this.alg = alg;
+	}
+
+	public File getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(File filePath) {
+		this.filePath = filePath;
 	}
 
 	@Override
@@ -57,7 +67,6 @@ public class MainApplication extends Application {
 			
 			Scene scene = new Scene(mainWindow);
 			primaryStage.setScene(scene);
-			primaryStage.setMaximized(true);
 			primaryStage.show();
 			
 		} catch (IOException e){

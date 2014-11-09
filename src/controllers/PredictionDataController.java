@@ -1,6 +1,5 @@
 package controllers;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -11,9 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import model.Prediction;
+import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
-import utilities.Utils;
 
 public class PredictionDataController {
 	
@@ -96,9 +95,7 @@ public class PredictionDataController {
 		this.hamDocuments.setText(alg.getnPredictHamDocuments().toString());
 		this.wellClasiffied.setText(alg.getWellAnalized().toString());
 		this.badClassified.setText(alg.getBadAnalized().toString());
-		Float percentage = (alg.getWellAnalized().floatValue() / alg.getnPredictDocuments()) * 100;
-		DecimalFormat df = new DecimalFormat("#.##");
-		this.percentage.setText(df.format(percentage) + " %");
+		this.percentage.setText(Utils.getPercentage(alg.getWellAnalized(), alg.getnPredictDocuments()));
 	}
 
 }
