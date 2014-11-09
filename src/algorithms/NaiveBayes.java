@@ -411,7 +411,7 @@ public class NaiveBayes {
 	private Map<String, List<Float>> generateProbabilities(Map<String, Integer> spamWords, Map<String, Integer> hamWords) {
 
 		Map<String, List<Float>> result = new HashMap<String, List<Float>>();
-		Float prob = new Float(0.0);
+		Float prob = new Float(1.0);
 		
 		//Posible fallo:  en el algoritmo del PDF , en el punto 2.4 , especifica La division de T_-tc ("ocurrencias de t en texto_c " en teoria esta bien , aunque te piden los textos concatenados por
 		//categoria , tenemos diferenciados dos mapas asiq es como si ya estuvieran contadod.) pero a ese T_-tc se le suma "1" . Esto si habria que añadirlo no ? , que no lo veo
@@ -427,7 +427,7 @@ public class NaiveBayes {
 			aux.add(0, prob);
 			// Añadimos una probabilidad 0 de que no sea spam (por si no aparece
 			// en el otro mapa)
-			aux.add(1, new Float(0.0));
+			aux.add(1, new Float(1.0));
 			result.put(entry.getKey(), aux);
 		}
 
@@ -441,7 +441,7 @@ public class NaiveBayes {
 				aux.set(1, prob);
 			} else { // Palabra que no apareció en los correos spam.
 				// Probabilidad 0 de que sea spam
-				aux.add(0, new Float(0.0));
+				aux.add(0, new Float(1.0));
 				aux.add(1, prob);
 			}
 			result.put(entry.getKey(), aux);
