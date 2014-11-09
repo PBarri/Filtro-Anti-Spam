@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -403,9 +404,6 @@ public class NaiveBayes {
 		Map<String, List<Float>> result = new HashMap<String, List<Float>>();
 		Float prob = new Float(1.0);
 		
-		//Posible fallo:  en el algoritmo del PDF , en el punto 2.4 , especifica La division de T_-tc ("ocurrencias de t en texto_c " en teoria esta bien , aunque te piden los textos concatenados por
-		//categoria , tenemos diferenciados dos mapas asiq es como si ya estuvieran contadod.) pero a ese T_-tc se le suma "1" . Esto si habria que añadirlo no ? , que no lo veo
-		// Este cambio lo he hecho ya . Pero lo revisamos, te dejo señalado con AQUI donde he cambiado
 		
 		// Se recorren los mapas para calcular las probabilidades
 		for (Entry<String, Integer> entry : spamWords.entrySet()) {
@@ -436,11 +434,40 @@ public class NaiveBayes {
 		}
 		
 		
-		//Esto siguiente no deberia aparecer, pues lo que es el calculo del log , se hace ya en "clasifica" que es el clasificar un nuevo correo con el entrenamiento ya echo.
+
 		this.initSpamProb = Math.abs(new Float(Math.log10(nSpamDocuments.doubleValue() / nDocuments)));
 		this.initHamProb = Math.abs(new Float(Math.log10(nHamDocuments.doubleValue() / nDocuments)));
 		
 		return result;
+		
+	}
+	
+	
+	public void generatePercentage(Integer percentage , String path)throws OpenFileException, NotTrainedException, NullPointerException, InvalidPathException
+	{
+		File file = new File(path);
+		
+		//Una vez pasado el while en esta lista quedarian los correos para probar el algoritmo despues de entrenarlo
+		List<File> allfiles = new ArrayList<File>();
+		//En esta lista pasado el while estan los correos de entrenamiento
+		List<File> entrenamiento = new ArrayList<>();
+		
+		this.iterateDirectories(file, allfiles);
+		
+		Integer max = allfiles.size()*percentage/100;
+		Integer aux = 0;
+		
+		while(entrenamiento.size()<max)
+		{	
+			
+			File f =  allfiles.get((int) (Math.random()*allfiles.size()));
+			entrenamiento.add(f);
+			allfiles.remove(f);
+			aux++;
+			
+		}
+		
+		//En este momento en entrenamiento tenemos los correos para entrenar y en allfiles el resto de correos
 		
 	}
 }
