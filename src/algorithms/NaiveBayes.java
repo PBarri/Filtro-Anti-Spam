@@ -496,19 +496,31 @@ public class NaiveBayes {
 		this.iterateDirectories(file, allfiles);
 		
 		Integer max = allfiles.size()*percentage/100;
-		Integer aux = 0;
+	
 		
 		while(entrenamiento.size()<max)
 		{	
 			
-			File f =  allfiles.get((int) (Math.random()*allfiles.size()));
+			File f =  allfiles.get((int) (Math.random()*(allfiles.size()-1)));
 			entrenamiento.add(f);
 			allfiles.remove(f);
-			aux++;
+			
 			
 		}
 		
 		//En este momento en entrenamiento tenemos los correos para entrenar y en allfiles el resto de correos
 		
+		//Entrenamos
+		this.train(entrenamiento);
+		
+		//Clasificamos el resto de correos
+		predictResults.clear();
+		for(File f: allfiles)
+		{
+			this.predict(f);
+			
+		}
+		
+		this.nPredictDocuments = allfiles.size();
 	}
 }
