@@ -9,11 +9,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import model.Probability;
 
 import com.google.common.io.Files;
 
@@ -22,12 +27,16 @@ import exceptions.NotTrainedException;
 import exceptions.OpenFileException;
 
 @XmlRootElement(name = "NaiveBayes")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class NaiveBayes {
 	
+	@XmlTransient
 	private static final String SPAM = "spam";
+	@XmlTransient
 	private static final String HAM = "ham";
 
 	// Para entrenamiento
+	@XmlTransient
 	private String path;
 	@XmlElement(name = "totalDocuments")
 	private Integer nDocuments;
@@ -41,23 +50,36 @@ public class NaiveBayes {
 	private Float initSpamProb;
 	@XmlElement(name = "initialHamProbability")
 	private Float initHamProb;
+	@XmlTransient
 	private Map<String, Integer> spamWords;
+	@XmlTransient
 	private Map<String, Integer> hamWords;
-	@XmlElement(name = "probabilities")
+	@XmlTransient
 	private Map<String, List<Float>> probabilities;
+	@XmlElementWrapper(name = "probabilities")
+	@XmlElement(name = "probability")
+	private List<Probability> probabilitiesList;
+	@XmlTransient
 	private Set<String> vocabulary;
 	
 	
 	// Para predicción
+	@XmlTransient
 	private Map<String, List<Float>> predictResults;
+	@XmlTransient
 	private Integer nPredictDocuments;
+	@XmlTransient
 	private Integer nPredictSpamDocuments;
+	@XmlTransient
 	private Integer nPredictHamDocuments;
+	@XmlTransient
 	private Integer wellAnalized;
+	@XmlTransient
 	private Integer badAnalized;
 
 	public NaiveBayes() {
 		this.probabilities = new HashMap<String, List<Float>>();
+		this.probabilitiesList = new ArrayList<Probability>();
 		this.spamWords = new HashMap<String, Integer>();
 		this.hamWords = new HashMap<String, Integer>();
 		this.vocabulary = new HashSet<String>();
@@ -157,6 +179,14 @@ public class NaiveBayes {
 
 	public void setProbabilities(Map<String, List<Float>> probabilities) {
 		this.probabilities = probabilities;
+	}
+
+	public List<Probability> getProbabilitiesList() {
+		return probabilitiesList;
+	}
+
+	public void setProbabilitiesList(List<Probability> probabilitiesList) {
+		this.probabilitiesList = probabilitiesList;
 	}
 
 	public Set<String> getVocabulary() {
@@ -430,9 +460,16 @@ public class NaiveBayes {
 				aux.add(0, new Float(1.0));
 				aux.add(1, prob);
 			}
-			result.put(entry.getKey(), aux);
+			result.put(entry.getKey(), aux);			
 		}
 		
+		for(Entry<String, List<Float>> entry : result.entrySet()){
+			String word = entry.getKey();
+			Float spamP = entry.getValue().get(0);
+			Float hamP = entry.getValue().get(1);
+			Probability p = new Probability(word, spamP, hamP);
+			probabilitiesList.add(p);
+		}
 		
 
 		this.initSpamProb = Math.abs(new Float(Math.log10(nSpamDocuments.doubleValue() / nDocuments)));

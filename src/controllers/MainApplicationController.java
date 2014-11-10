@@ -1,16 +1,20 @@
 package controllers;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.stage.FileChooser;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.stage.FileChooser;
+import model.Probability;
 
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
@@ -79,8 +83,8 @@ public class MainApplicationController {
 					m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 					m.marshal(this.mainApplication.getAlg(), file);
 				} catch (JAXBException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
+					//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al guardar el entrenamiento").showError();
 				}
 			}else{
 				Dialogs.create().title("Error").masthead(null).message("No es un archivo .xml").showError();
@@ -100,18 +104,33 @@ public class MainApplicationController {
 		File file = chooser.showOpenDialog(mainApplication.getPrimaryStage());
 		
 		if(file != null){
-			pref.put("loadFile", file.getAbsolutePath());
+			pref.put("loadFile", file.getParentFile().getAbsolutePath());
 			try {
 				JAXBContext context = JAXBContext.newInstance(NaiveBayes.class);
 				Unmarshaller um = context.createUnmarshaller();
 				
 				alg = (NaiveBayes) um.unmarshal(file);
 				
+				// Rellenamos el map de probabilities y los StringProperties de Probability
+				List<Probability> probs = new ArrayList<Probability>();
+				probs.addAll(alg.getProbabilitiesList());
+				alg.getProbabilities().clear();
+				alg.getProbabilitiesList().clear();
+				for(Probability prob : probs){
+					Probability p = new Probability(prob.getWordValue(), prob.getSpamProbabilityValue(), prob.getHamProbabilityValue());
+					List<Float> aux = new ArrayList<Float>();
+					aux.add(p.getSpamProbabilityValue());
+					aux.add(p.getHamProbabilityValue());
+					alg.getProbabilitiesList().add(p);
+					alg.getProbabilities().put(p.getWordValue(), aux);
+				}
+				
 				this.mainApplication.setFilePath(file);
 				this.mainApplication.setAlg(alg);
+				this.mainApplication.showNaiveBayesData();
 			} catch (JAXBException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al cargar el entrenamiento").showError();
 			}
 		}
 	}

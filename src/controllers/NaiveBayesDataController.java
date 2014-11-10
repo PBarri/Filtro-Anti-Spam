@@ -1,9 +1,5 @@
 package controllers;
 
-import java.util.List;
-import java.util.Map.Entry;
-
-import utilities.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import model.Probability;
+import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 
@@ -75,17 +72,7 @@ public class NaiveBayesDataController {
 	}
 	
 	public void getProbabilities(NaiveBayes alg){
-		String word, spamP, hamP;
-		Float probSpam, probHam;
-		for(Entry<String, List<Float>> entry : alg.getProbabilities().entrySet()){
-			probSpam = entry.getValue().get(0);
-			probHam = entry.getValue().get(1);
-			word = entry.getKey();
-			spamP = Utils.getPercentage(probSpam, null);
-			hamP = Utils.getPercentage(probHam, null);
-			Probability p = new Probability(word, spamP, hamP);
-			probabilitiesData.add(p);
-		}
+		probabilitiesData.addAll(alg.getProbabilitiesList());
 		table.setItems(probabilitiesData);
 	}
 	
