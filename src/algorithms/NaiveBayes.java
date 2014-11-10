@@ -256,7 +256,8 @@ public class NaiveBayes {
 	 */
 	public void train(String path) throws NullPointerException, InvalidPathException, OpenFileException{
 		this.path = path;
-		this.train();
+		List<File> files = null;
+		this.train(files);
 		
 //		//Estas 4 lineas siguientes corresponde al array prior que debe devolver el entrenamiento, no se si al unir los archivos lo borraste
 //		Integer auxSpam = nSpamDocuments / nDocuments;
@@ -265,16 +266,22 @@ public class NaiveBayes {
 //		prior.put("ham", auxham);
 	}
 	
-	private void train() throws NullPointerException, InvalidPathException, OpenFileException {
+	public void train(List<File> files) throws NullPointerException, InvalidPathException, OpenFileException {
 
-		File file = new File(path);
 		List<File> filesToAnalize = new ArrayList<File>();
-		// Comprobamos que nos han pasado una ruta de una carpeta y no de un archivo
-		if (file.isDirectory()) {
-			iterateDirectories(file, filesToAnalize);
-		} else {
-			throw new InvalidPathException("La ruta es inválida");
+		
+		if(files != null){
+			filesToAnalize = files;
+		}else{
+			File file = new File(path);
+			// Comprobamos que nos han pasado una ruta de una carpeta y no de un archivo
+			if (file.isDirectory()) {
+				iterateDirectories(file, filesToAnalize);
+			} else {
+				throw new InvalidPathException("La ruta es inválida");
+			}
 		}
+		
 		nDocuments = filesToAnalize.size();
 		
 		for(File f : filesToAnalize){
@@ -329,8 +336,6 @@ public class NaiveBayes {
 		Float totalSpamProb = this.initSpamProb;
 		Float totalHamProb = this.initHamProb;
 		List<Float> results = new ArrayList<Float>();
-//		Map<String, Integer> trainedWords = new HashMap<String, Integer>();
-//		Map<String, Integer> untrainedWords = new HashMap<String, Integer>();
 		
 		String[] fileWords = loadWords(file);
 		for(String s : fileWords){
@@ -339,8 +344,6 @@ public class NaiveBayes {
 				Float tempHamProb = Math.abs(new Float(Math.log10(probabilities.get(s).get(1))));
 				totalSpamProb += tempSpamProb;
 				totalHamProb += tempHamProb;
-			}else{
-				// Aqui que tiene que haber ¿?
 			}
 		}
 		results.add(totalSpamProb);
@@ -439,10 +442,10 @@ public class NaiveBayes {
 		for (Entry<String, Integer> entry : spamWords.entrySet()) {
 			List<Float> aux = new ArrayList<Float>();
 			// Calculamos la probabilidad de que la palabra sea spam
-			prob = (entry.getValue().floatValue() +1)/ (totalWords + vocabulary.size()); //AQUI , el denominador tambien he cambiado , en el algoritmo y los otros lo tienen asi.(preguntame y te cuento)
+			prob = (entry.getValue().floatValue() +1)/ (totalWords + vocabulary.size());
 			aux.add(0, prob);
-			// Añadimos una probabilidad 0 de que no sea spam (por si no aparece
-			// en el otro mapa)
+			// Añadimos una probabilidad 1 de que no sea spam (por si no aparece
+			// en el otro mapa. 1 porque el logaritmo de 1 es 0)
 			aux.add(1, new Float(1.0));
 			result.put(entry.getKey(), aux);
 		}
@@ -450,19 +453,20 @@ public class NaiveBayes {
 		for (Entry<String, Integer> entry : hamWords.entrySet()) {
 			List<Float> aux = new ArrayList<Float>();
 			// Calculamos la probabilidad de que la palabra sea ham
-			prob = entry.getValue().floatValue() / (totalWords + vocabulary.size());//AQUI , el denominador tambien he cambiado , en el algoritmo y los otros lo tienen asi.
+			prob = entry.getValue().floatValue() / (totalWords + vocabulary.size());
 			// Apareció en el mapa de palabras spam
 			if (result.containsKey(entry.getKey())) {
 				aux = result.get(entry.getKey());
 				aux.set(1, prob);
 			} else { // Palabra que no apareció en los correos spam.
-				// Probabilidad 0 de que sea spam
+				// Probabilidad 1 de que sea spam
 				aux.add(0, new Float(1.0));
 				aux.add(1, prob);
 			}
 			result.put(entry.getKey(), aux);			
 		}
 		
+		// Rellenamos la lista de Probability para mostrar en la interfaz
 		for(Entry<String, List<Float>> entry : result.entrySet()){
 			String word = entry.getKey();
 			Float spamP = entry.getValue().get(0);

@@ -59,6 +59,7 @@ public class MainApplicationController {
 	private void newTraining(){
 		Action response = Dialogs.create().title("Confirma solicitud").masthead(null).message("¿Desea borrar los datos del entrenamiento?").showConfirm();
 		if(response.equals(Dialog.ACTION_YES)){
+			this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam");
 			this.mainApplication.showHome(true);
 			Dialogs.create().title("Nuevo entrenamiento").masthead(null).message("Todos los datos del entrenamiento realizado se han borrado").showInformation();
 		}else if(response.equals(Dialog.ACTION_NO)){
@@ -76,15 +77,16 @@ public class MainApplicationController {
 		File file = chooser.showSaveDialog(this.mainApplication.getPrimaryStage());
 		
 		if(file != null){
-			if(!file.getPath().endsWith("*.xml")){
+			if(file.getPath().endsWith(".xml")){
 				try {
 					JAXBContext context = JAXBContext.newInstance(NaiveBayes.class);
 					Marshaller m = context.createMarshaller();
 					m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 					m.marshal(this.mainApplication.getAlg(), file);
+					this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam - " + file.getName());
 				} catch (JAXBException e) {
 					e.printStackTrace();
-					//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al guardar el entrenamiento").showError();
+					Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al guardar el entrenamiento").showError();
 				}
 			}else{
 				Dialogs.create().title("Error").masthead(null).message("No es un archivo .xml").showError();
@@ -128,6 +130,7 @@ public class MainApplicationController {
 				this.mainApplication.setFilePath(file);
 				this.mainApplication.setAlg(alg);
 				this.mainApplication.showNaiveBayesData();
+				this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam - " + file.getName());
 			} catch (JAXBException e) {
 				e.printStackTrace();
 				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al cargar el entrenamiento").showError();
