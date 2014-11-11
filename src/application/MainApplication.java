@@ -14,6 +14,7 @@ import controllers.HomeController;
 import controllers.MainApplicationController;
 import controllers.NaiveBayesDataController;
 import controllers.PredictionDataController;
+import controllers.TrainPredictDataController;
 
 public class MainApplication extends Application {
 
@@ -50,6 +51,8 @@ public class MainApplication extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Filtro Anti Spam");
+		this.primaryStage.setMinHeight(600);
+		this.primaryStage.setMinWidth(600);
 		
 		initMainWindow();
 		showHome(true);
@@ -122,6 +125,22 @@ public class MainApplication extends Application {
 			PredictionDataController controller = loader.getController();
 			controller.setMainApplication(this);
 			controller.getPredictionsData(alg);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void showTrainPredictData() {
+		try{
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApplication.class.getResource("/views/TrainPredictData.fxml"));
+			AnchorPane trainPredictData = (AnchorPane) loader.load();
+			
+			mainWindow.setCenter(trainPredictData);
+			
+			TrainPredictDataController controller = loader.getController();
+			controller.setMainApplication(this);
+			controller.getData(alg);
 		}catch(IOException e){
 			e.printStackTrace();
 		}

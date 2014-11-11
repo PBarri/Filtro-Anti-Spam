@@ -3,10 +3,13 @@ package controllers;
 import java.io.File;
 import java.util.prefs.Preferences;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
+import javafx.util.StringConverter;
 
 import org.controlsfx.dialog.Dialogs;
 
@@ -40,6 +43,12 @@ public class HomeController {
 	@FXML
 	private Button predict;
 	
+	@FXML
+	private Slider slider;
+	
+	@FXML
+	private TextField sliderText;
+	
 	public HomeController(){
 	
 	}
@@ -50,6 +59,22 @@ public class HomeController {
 
 	public void setMainApplication(MainApplication mainApplication) {
 		this.mainApplication = mainApplication;
+	}
+	
+	@FXML
+	private void initialize(){
+		Bindings.bindBidirectional(sliderText.textProperty(), slider.valueProperty(), new StringConverter<Number>() {
+
+			@Override
+			public Number fromString(String text) {
+				return new Integer(text);
+			}
+
+			@Override
+			public String toString(Number number) {
+				return new Integer(number.intValue()).toString();
+			}
+		});
 	}
 	
 	@FXML
@@ -72,7 +97,7 @@ public class HomeController {
 	private void train(){
 		NaiveBayes alg = mainApplication.getAlg();
 		try {
-			alg.train(trainPath.getText(), 100);
+			alg.train(trainPath.getText(), new Double(slider.getValue()).intValue());
 		} catch (NullPointerException e) {
 			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
 			return;
@@ -90,7 +115,11 @@ public class HomeController {
 			return;
 		}
 		this.mainApplication.setAlg(alg);
-		this.mainApplication.showNaiveBayesData();
+		if(new Double(slider.getValue()).intValue() != 100){
+			this.mainApplication.showTrainPredictData();
+		}else{
+			this.mainApplication.showNaiveBayesData();
+		}
 	}
 	
 	@FXML
@@ -128,5 +157,4 @@ public class HomeController {
 		this.mainApplication.setAlg(alg);
 		this.mainApplication.showPredictions();
 	}
-
 }

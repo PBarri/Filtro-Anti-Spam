@@ -18,6 +18,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import utilities.Utils;
+import model.Prediction;
 import model.Probability;
 
 import com.google.common.io.Files;
@@ -76,6 +78,7 @@ public class NaiveBayes {
 	private Integer wellAnalized;
 	@XmlTransient
 	private Integer badAnalized;
+	private List<Prediction> predictionList;
 
 	public NaiveBayes() {
 		this.probabilities = new HashMap<String, List<Float>>();
@@ -244,6 +247,14 @@ public class NaiveBayes {
 
 	public void setBadAnalized(Integer badAnalized) {
 		this.badAnalized = badAnalized;
+	}
+
+	public List<Prediction> getPredictionList() {
+		return predictionList;
+	}
+
+	public void setPredictionList(List<Prediction> predictionList) {
+		this.predictionList = predictionList;
 	}
 
 	/**
@@ -442,6 +453,18 @@ public class NaiveBayes {
 			// Introducimos los resultados en el mapa que se mostrará luego en la interfaz
 			predictResults.put(file.getName(), results);
 		}
+		
+		for(Entry<String, List<Float>> entry : predictResults.entrySet()){
+			Prediction p = new Prediction();
+			List<String> aux = Utils.convertPredictions(entry.getValue());
+			p.setFilename(entry.getKey());
+			p.setSpamProbability(aux.get(0));
+			p.setHamProbability(aux.get(1));
+			p.setCategory(aux.get(2));
+			p.setRealCategory(aux.get(3));
+			predictionList.add(p);
+		}
+		
 	}
 
 	/**

@@ -1,8 +1,5 @@
 package controllers;
 
-import java.util.List;
-import java.util.Map.Entry;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -78,17 +75,8 @@ public class PredictionDataController {
 		this.mainApplication = mainApplication;
 	}
 	
-	public void getPredictionsData(NaiveBayes alg){
-		for(Entry<String, List<Float>> entry : alg.getPredictResults().entrySet()){
-			Prediction p = new Prediction();
-			List<String> aux = Utils.convertPredictions(entry.getValue());
-			p.setFilename(entry.getKey());
-			p.setSpamProbability(aux.get(0));
-			p.setHamProbability(aux.get(1));
-			p.setCategory(aux.get(2));
-			p.setRealCategory(aux.get(3));
-			predictionsData.add(p);
-		}
+	public void getPredictionsData(NaiveBayes alg){			
+		predictionsData.addAll(alg.getPredictionList());
 		table.setItems(predictionsData);
 		this.totalDocuments.setText(alg.getnPredictDocuments().toString());
 		this.spamDocuments.setText(alg.getnPredictSpamDocuments().toString());

@@ -17,6 +17,7 @@
                  <MenuItem mnemonicParsing="false" onAction="#newTraining" text="Nuevo" />
                   <MenuItem mnemonicParsing="false" onAction="#load" text="Cargar" />
                   <MenuItem mnemonicParsing="false" onAction="#save" text="Guardar" />
+                  <MenuItem mnemonicParsing="false" text="Guardar como..." />
              	 <MenuItem mnemonicParsing="false" onAction="#close" text="Cerrar" />
             </items>
           </Menu>
