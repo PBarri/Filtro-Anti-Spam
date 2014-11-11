@@ -14,6 +14,7 @@ import algorithms.NaiveBayes;
 import application.MainApplication;
 import exceptions.InvalidPathException;
 import exceptions.NotTrainedException;
+import exceptions.NotValidPercentageException;
 import exceptions.OpenFileException;
 
 @SuppressWarnings("deprecation")
@@ -71,7 +72,7 @@ public class HomeController {
 	private void train(){
 		NaiveBayes alg = mainApplication.getAlg();
 		try {
-			alg.train(trainPath.getText());
+			alg.train(trainPath.getText(), 100);
 		} catch (NullPointerException e) {
 			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
 			return;
@@ -80,6 +81,12 @@ public class HomeController {
 			return;
 		} catch (OpenFileException e) {
 			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
+			return;
+		} catch (NotValidPercentageException e) {
+			Dialogs.create().title("Error").masthead(null).message("El porcentaje no puede ser menor que el 20%").showError();
+			return;
+		} catch (Exception e) {
+			Dialogs.create().title("Error").masthead(null).message("Se ha producido un error").showError();
 			return;
 		}
 		this.mainApplication.setAlg(alg);
@@ -113,6 +120,9 @@ public class HomeController {
 			return;
 		} catch (NotTrainedException e) {
 			Dialogs.create().title("Error").masthead("Entrenamiento erróneo").message("Debe entrenar un conjunto de correos antes de clasificar").showError();
+			return;
+		} catch (Exception e) {
+			Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
 			return;
 		}
 		this.mainApplication.setAlg(alg);
