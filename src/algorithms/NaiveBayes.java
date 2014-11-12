@@ -310,7 +310,7 @@ public class NaiveBayes {
 		List<File> allFiles = new ArrayList<File>(filesToTrain);
 		filesToTrain.clear();
 		
-		Integer nFiles = allFiles.size() - 1;
+		Integer nFiles = allFiles.size();
 		Integer nFilesToTrain = allFiles.size() * percentage / 100;
 		
 		for(int i = 0; i < nFilesToTrain; i++){
