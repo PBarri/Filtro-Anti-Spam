@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -98,6 +99,7 @@ public class NaiveBayes {
 		// clasificación},
 		// [3] -> Clasificación real {1 -> Spam, 2 -> Ham}
 		this.predictResults = new HashMap<String, List<Float>>();
+		this.predictionList = new ArrayList<Prediction>();
 		this.nPredictDocuments = 0;
 		this.nPredictSpamDocuments = 0;
 		this.nPredictHamDocuments = 0;
@@ -310,16 +312,13 @@ public class NaiveBayes {
 		List<File> allFiles = new ArrayList<File>(filesToTrain);
 		filesToTrain.clear();
 		
-		Integer nFiles = allFiles.size();
 		Integer nFilesToTrain = allFiles.size() * percentage / 100;
 		
-		for(int i = 0; i < nFilesToTrain; i++){
-			File f = allFiles.get((int) (Math.random() * nFiles));
-			filesToTrain.add(f);
-			allFiles.remove(f);
-		}
+		Collections.shuffle(allFiles);
 		
-		filesToPredict.addAll(allFiles);		
+		filesToTrain.addAll(allFiles.subList(0, nFilesToTrain));
+		filesToPredict.addAll(allFiles.subList(nFilesToTrain, allFiles.size()));
+		
 	}
 	
 	/**

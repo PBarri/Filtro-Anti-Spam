@@ -111,6 +111,7 @@ public class HomeController {
 			Dialogs.create().title("Error").masthead(null).message("El porcentaje no puede ser menor que el 20%").showError();
 			return;
 		} catch (Exception e) {
+			e.printStackTrace();
 			Dialogs.create().title("Error").masthead(null).message("Se ha producido un error").showError();
 			return;
 		}
