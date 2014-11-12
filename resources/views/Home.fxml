@@ -6,15 +6,15 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="650.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HomeController">
+<AnchorPane prefHeight="650.0" prefWidth="600.0" stylesheets="@../css/theme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HomeController">
    <children>
-      <GridPane alignment="CENTER" hgap="10.0" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="600.0" style="-fx-border-color: black; -fx-border-radius: 10;" vgap="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <GridPane alignment="CENTER" hgap="10.0" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="600.0" vgap="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
             <AnchorPane GridPane.rowIndex="1">
                <children>
                   <VBox alignment="TOP_CENTER" prefHeight="295.0" prefWidth="550.0" style="-fx-border-color: black; -fx-border-radius: 10px; -fx-padding: 10px;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="48.0" prefWidth="275.0" text="ENTRENAMIENTO" textAlignment="CENTER">
+                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="48.0" prefWidth="275.0" styleClass="label-bright" text="ENTRENAMIENTO" textAlignment="CENTER">
                            <font>
                               <Font name="System Bold" size="30.0" />
                            </font>
@@ -39,7 +39,7 @@
                               </TextField>
                            </children>
                         </HBox>
-                        <Button fx:id="train" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#train" prefHeight="40.0" prefWidth="95.0" text="Entrenar">
+                        <Button fx:id="train" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#train" prefHeight="30.0" prefWidth="120.0" text="Entrenar">
                            <opaqueInsets>
                               <Insets bottom="25.0" top="25.0" />
                            </opaqueInsets>
@@ -53,12 +53,15 @@
                      </opaqueInsets>
                   </VBox>
                </children>
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding>
             </AnchorPane>
             <AnchorPane GridPane.rowIndex="2">
                <children>
                   <VBox alignment="TOP_CENTER" prefHeight="295.0" prefWidth="550.0" style="-fx-border-color: black; -fx-border-radius: 10px; -fx-padding: 10px;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="48.0" prefWidth="275.0" text="PREDICCIÓN" textAlignment="CENTER">
+                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="48.0" prefWidth="275.0" styleClass="label-bright" text="PREDICCIÓN" textAlignment="CENTER">
                            <font>
                               <Font name="System Bold" size="30.0" />
                            </font>
@@ -72,21 +75,27 @@
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </HBox>
-                        <Button fx:id="predict" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#predict" prefHeight="40.0" prefWidth="95.0" text="Predecir" />
+                        <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="predict" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#predict" prefHeight="30.0" prefWidth="120.0" text="Predecir" />
+                           </children></HBox>
                      </children>
                   </VBox>
                </children>
+               <GridPane.margin>
+                  <Insets top="5.0" />
+               </GridPane.margin>
             </AnchorPane>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane prefHeight="150.0" prefWidth="200.0">
                <children>
                   <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="550.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label alignment="TOP_CENTER" text="ALGORITMO">
+                        <Label alignment="TOP_CENTER" styleClass="label-header" text="ALGORITMO">
                            <font>
                               <Font name="System Bold" size="50.0" />
                            </font>
                         </Label>
-                        <Label alignment="CENTER" contentDisplay="CENTER" text="NAIVE BAYES">
+                        <Label alignment="CENTER" contentDisplay="CENTER" styleClass="label-header" text="NAIVE BAYES">
                            <font>
                               <Font name="System Bold" size="50.0" />
                            </font>
