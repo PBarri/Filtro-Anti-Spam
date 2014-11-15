@@ -167,9 +167,9 @@
       		</SplitPane>
             <HBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="200.0" spacing="15.0">
                <children>
-                  <Button mnemonicParsing="false" prefWidth="100.0" text="Predecir" />
-                  <Button mnemonicParsing="false" text="Inicio" />
-                  <Button mnemonicParsing="false" text="Nuevo" />
+                  <Button mnemonicParsing="false" prefWidth="100.0" onAction="#back" text="Atrás" />
+                  <Button mnemonicParsing="false" prefWidth="100.0" onAction="#newTrain" text="Nuevo" />
+                  <Button mnemonicParsing="false" prefWidth="100.0" onAction="#predict" text="Predecir" />
                </children>
                <padding>
                   <Insets left="20.0" right="20.0" />

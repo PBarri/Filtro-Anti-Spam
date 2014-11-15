@@ -1,5 +1,9 @@
 package controllers;
 
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialogs;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,6 +15,7 @@ import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 
+@SuppressWarnings("deprecation")
 public class PredictionDataController {
 	
 	private MainApplication mainApplication;
@@ -84,6 +89,14 @@ public class PredictionDataController {
 		this.wellClasiffied.setText(alg.getWellAnalized().toString());
 		this.badClassified.setText(alg.getBadAnalized().toString());
 		this.percentage.setText(Utils.getPercentage(alg.getWellAnalized(), alg.getnPredictDocuments()));
+	}
+	
+	@FXML
+	public void back(){
+		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea volver atrás?\nPerderá los datos de la predicción").showConfirm();
+		if(response.equals(Dialog.ACTION_YES)){
+			this.mainApplication.showNaiveBayesData();
+		}
 	}
 
 }

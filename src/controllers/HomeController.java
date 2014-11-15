@@ -116,6 +116,7 @@ public class HomeController {
 			return;
 		}
 		this.mainApplication.setAlg(alg);
+		this.mainApplication.getPrimaryStage().setTitle("Filtro Anti-Spam - Nuevo[Sin guardar]");
 		if(new Double(slider.getValue()).intValue() != 100){
 			this.mainApplication.showTrainPredictData();
 		}else{

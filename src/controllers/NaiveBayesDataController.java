@@ -1,16 +1,28 @@
 package controllers;
 
+import java.io.File;
+import java.util.prefs.Preferences;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.DirectoryChooser;
 import model.Probability;
+
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialogs;
+
+import exceptions.NotTrainedException;
+import exceptions.OpenFileException;
 import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 
+@SuppressWarnings("deprecation")
 public class NaiveBayesDataController {
 
 	private MainApplication mainApplication;
@@ -84,6 +96,51 @@ public class NaiveBayesDataController {
 		this.wordsAnalizedLabel.setText(alg.getTotalWords().toString());
 		this.initSpamProb.setText(Utils.getPercentage(alg.getInitSpamProb(), null));
 		this.initHamProb.setText(Utils.getPercentage(alg.getInitHamProb(), null));
+	}
+	
+	@FXML
+	public void back(){
+		mainApplication.showHome(false);
+	}
+	
+	@FXML
+	public void newTrain(){
+		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea crear un nuevo entrenamiento?\nPerderá todos los datos no guardados").showConfirm();
+		if (response.equals(Dialog.ACTION_YES)) {
+			this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam");
+			this.mainApplication.showHome(true);
+		}
+	}
+	
+	@FXML
+	public void predict(){
+		Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+		String filePath = pref.get("predictDirectory", System.getProperty("user.home"));
+		DirectoryChooser chooser = new DirectoryChooser();
+		chooser.setTitle("Escoge un archivo o directorio");
+		File initialFile = new File(filePath);
+		chooser.setInitialDirectory(initialFile);
+		
+		File file = chooser.showDialog(mainApplication.getPrimaryStage());
+		
+		if(file != null){
+			pref.put("predictDirectory", file.getAbsolutePath());
+			NaiveBayes alg = mainApplication.getAlg();
+			try {
+				alg.predict(file.getAbsolutePath());
+			} catch (OpenFileException e) {
+				Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
+				return;
+			} catch (NotTrainedException e) {
+				Dialogs.create().title("Error").masthead("Entrenamiento erróneo").message("Debe entrenar un conjunto de correos antes de clasificar").showError();
+				return;
+			} catch (Exception e) {
+				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+				return;
+			}
+			this.mainApplication.setAlg(alg);
+			this.mainApplication.showPredictions();
+		}
 	}
 	
 }
