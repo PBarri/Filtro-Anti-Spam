@@ -4,8 +4,12 @@ import java.io.File;
 import java.util.prefs.Preferences;
 
 import javafx.beans.binding.Bindings;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
@@ -13,6 +17,7 @@ import javafx.util.StringConverter;
 
 import org.controlsfx.dialog.Dialogs;
 
+import tasks.TrainTask;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 import exceptions.InvalidPathException;
@@ -96,7 +101,26 @@ public class HomeController {
 	@FXML
 	private void train(){
 		NaiveBayes alg = mainApplication.getAlg();
-		try {
+		TrainTask trainTask = new TrainTask(mainApplication, trainPath.getText());
+		Thread t = new Thread(trainTask);
+		t.setDaemon(true);
+		Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Entrenando").masthead(null).showWorkerProgress(trainTask);
+		trainTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			
+			@Override
+			public void handle(WorkerStateEvent event) {
+				mainApplication.setAlg(alg);
+				mainApplication.getPrimaryStage().setTitle("Filtro Anti-Spam - Nuevo[Sin guardar]");
+				if(new Double(slider.getValue()).intValue() != 100){
+					mainApplication.showTrainPredictData();
+				}else{
+					mainApplication.showNaiveBayesData();
+				}		
+			}
+		});
+		
+		t.start();
+/*		try {
 			alg.train(trainPath.getText(), new Double(slider.getValue()).intValue());
 		} catch (NullPointerException e) {
 			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
@@ -114,14 +138,7 @@ public class HomeController {
 			e.printStackTrace();
 			Dialogs.create().title("Error").masthead(null).message("Se ha producido un error").showError();
 			return;
-		}
-		this.mainApplication.setAlg(alg);
-		this.mainApplication.getPrimaryStage().setTitle("Filtro Anti-Spam - Nuevo[Sin guardar]");
-		if(new Double(slider.getValue()).intValue() != 100){
-			this.mainApplication.showTrainPredictData();
-		}else{
-			this.mainApplication.showNaiveBayesData();
-		}
+		}*/
 	}
 	
 	@FXML

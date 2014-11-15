@@ -1,8 +1,15 @@
 package utilities;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.io.Files;
+
+import exceptions.OpenFileException;
 
 public class Utils {
 	
@@ -48,6 +55,35 @@ public class Utils {
 			percentage = number.floatValue() * 100;
 		}		
 		return df.format(percentage) + " %";
+	}
+	
+	public static void iterateDirectories(File file, List<File> filesToAnalize) throws NullPointerException {
+		// Si el archivo es un directorio, se van recorriendo todos sus hijos llamando recursivamente a este método
+		if (file.isDirectory()) {
+			for (File f : file.listFiles()) {
+				iterateDirectories(f, filesToAnalize);
+			}
+		} else { // Si es un archivo se manda a una función para que sea analizado
+			// Comprobamos que los archivos están dentro de las carpetas spam o ham
+			if (file.getParentFile().getName().toLowerCase().matches("spam|ham")) {
+				filesToAnalize.add(file);
+			}
+		}
+	}
+	
+	public static String[] loadWords(File file) throws OpenFileException {
+		try {
+			// Pasamos a una cadena de texto el correo
+			String content = Files.toString(file, Charset.defaultCharset());
+			// Se ponen en minúscula
+			content.toLowerCase();
+			// Expresión regular que separa por todos los signos de puntuación
+			String[] fileWords = content.split("([^a-zA-Z0-9])+");
+
+			return fileWords;
+		} catch (IOException e) {
+			throw new OpenFileException(file);
+		}
 	}
 
 }
