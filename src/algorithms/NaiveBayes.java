@@ -1,8 +1,6 @@
 package algorithms;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,12 +17,9 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import utilities.Utils;
 import model.Prediction;
 import model.Probability;
-
-import com.google.common.io.Files;
-
+import utilities.Utils;
 import exceptions.InvalidPathException;
 import exceptions.NotTrainedException;
 import exceptions.NotValidPercentageException;
@@ -283,7 +278,7 @@ public class NaiveBayes {
 		// archivo
 		if (file.isDirectory()) {
 			// Iteramos sobre sus subcarpetas y archivos para sacar todos los  archivos a analizar
-			iterateDirectories(file, filesToAnalize);
+			Utils.iterateDirectories(file, filesToAnalize);
 		} else {
 			throw new InvalidPathException("La ruta es inválida");
 		}
@@ -291,7 +286,7 @@ public class NaiveBayes {
 		// Si el porcentaje es menor que 100, creamos dos archivos, y hacemos el entrenamiento y la predicción a la vez
 		if(percentage < 100){
 			List<File> filesToPredict = new ArrayList<File>();
-			getFilesByPercentage(percentage, filesToAnalize, filesToPredict);
+			Utils.getFilesByPercentage(percentage, filesToAnalize, filesToPredict);
 			this.nDocuments = filesToAnalize.size();
 			this.nPredictDocuments = filesToPredict.size();
 			this.train(filesToAnalize);
@@ -305,20 +300,6 @@ public class NaiveBayes {
 		nDocuments = filesToAnalize.size();
 
 		this.train(filesToAnalize);
-	}
-	
-	private void getFilesByPercentage(Integer percentage, List<File> filesToTrain, List<File> filesToPredict){
-		
-		List<File> allFiles = new ArrayList<File>(filesToTrain);
-		filesToTrain.clear();
-		
-		Integer nFilesToTrain = allFiles.size() * percentage / 100;
-		
-		Collections.shuffle(allFiles);
-		
-		filesToTrain.addAll(allFiles.subList(0, nFilesToTrain));
-		filesToPredict.addAll(allFiles.subList(nFilesToTrain, allFiles.size()));
-		
 	}
 	
 	/**
@@ -335,7 +316,7 @@ public class NaiveBayes {
 		// Para cada archivo, rellena los mapas spamWords y hamWords con las
 		// palabras que aparecen en ellos y el número de repeticiones
 		for (File f : filesToAnalize) {
-			String[] fileWords = loadWords(f);
+			String[] fileWords = Utils.loadWords(f);
 			// También vamos contando el número total de palabras
 			totalWords += fileWords.length;
 			if (f.getParentFile().getName().equals(SPAM)) {
@@ -382,7 +363,7 @@ public class NaiveBayes {
 
 		// Rellenamos los archivos a analizar
 		if (file.isDirectory()) {
-			iterateDirectories(file, filesToAnalize);
+			Utils.iterateDirectories(file, filesToAnalize);
 		} else {
 			filesToAnalize.add(file);
 		}
@@ -400,6 +381,10 @@ public class NaiveBayes {
 		
 		// Vaciamos los resultados previos
 		predictResults.clear();
+		wellAnalized = 0;
+		badAnalized = 0;
+		nPredictHamDocuments = 0;
+		nPredictSpamDocuments = 0;
 		
 		// Para cada archivo, intentamos predecir si será un correo spam o ham
 		for (File file : filesToAnalize) {
@@ -411,7 +396,7 @@ public class NaiveBayes {
 			List<Float> results = new ArrayList<Float>();
 
 			// Cargamos las palabras contenidas en el correo
-			String[] fileWords = loadWords(file);
+			String[] fileWords = Utils.loadWords(file);
 			for (String s : fileWords) {
 				if (probabilities.containsKey(s)) {
 					Float tempSpamProb = Math.abs(new Float(Math.log10(probabilities.get(s).get(0))));
@@ -464,48 +449,6 @@ public class NaiveBayes {
 			predictionList.add(p);
 		}
 		
-	}
-
-	/**
-	 * Método que recorre los directorios, insertando en filesToAnalize todos
-	 * los archivos deseados
-	 * 
-	 * @param file -> Directorio/fichero a analizar
-	 * @param filesToAnalize -> Lista de archivos que se utilizarán para cargar las palabras
-	 */
-	private void iterateDirectories(File file, List<File> filesToAnalize) throws NullPointerException {
-		// Si el archivo es un directorio, se van recorriendo todos sus hijos llamando recursivamente a este método
-		if (file.isDirectory()) {
-			for (File f : file.listFiles()) {
-				iterateDirectories(f, filesToAnalize);
-			}
-		} else { // Si es un archivo se manda a una función para que sea analizado
-			// Comprobamos que los archivos están dentro de las carpetas spam o ham
-			if (file.getParentFile().getName().toLowerCase().matches("spam|ham")) {
-				filesToAnalize.add(file);
-			}
-		}
-	}
-
-	/**
-	 * Método que se utiliza para leer el contenido del archivo
-	 * @param file -> Archivo del que se quiere leer el contenido
-	 * @return Un array de String con todas las palabras que contiene el archivo
-	 * @throws OpenFileException
-	 */
-	private String[] loadWords(File file) throws OpenFileException {
-		try {
-			// Pasamos a una cadena de texto el correo
-			String content = Files.toString(file, Charset.defaultCharset());
-			// Se ponen en minúscula
-			content.toLowerCase();
-			// Expresión regular que separa por todos los signos de puntuación
-			String[] fileWords = content.split("([^a-zA-Z0-9])+");
-
-			return fileWords;
-		} catch (IOException e) {
-			throw new OpenFileException(file);
-		}
 	}
 
 	/**

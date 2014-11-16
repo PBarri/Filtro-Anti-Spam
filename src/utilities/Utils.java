@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.io.Files;
@@ -57,6 +58,13 @@ public class Utils {
 		return df.format(percentage) + " %";
 	}
 	
+	/**
+	 * Método que recorre los directorios, insertando en filesToAnalize todos
+	 * los archivos deseados
+	 * 
+	 * @param file -> Directorio/fichero a analizar
+	 * @param filesToAnalize -> Lista de archivos que se utilizarán para cargar las palabras
+	 */
 	public static void iterateDirectories(File file, List<File> filesToAnalize) throws NullPointerException {
 		// Si el archivo es un directorio, se van recorriendo todos sus hijos llamando recursivamente a este método
 		if (file.isDirectory()) {
@@ -71,6 +79,12 @@ public class Utils {
 		}
 	}
 	
+	/**
+	 * Método que se utiliza para leer el contenido del archivo
+	 * @param file -> Archivo del que se quiere leer el contenido
+	 * @return Un array de String con todas las palabras que contiene el archivo
+	 * @throws OpenFileException
+	 */
 	public static String[] loadWords(File file) throws OpenFileException {
 		try {
 			// Pasamos a una cadena de texto el correo
@@ -84,6 +98,26 @@ public class Utils {
 		} catch (IOException e) {
 			throw new OpenFileException(file);
 		}
+	}
+	
+	/**
+	 * 
+	 * @param percentage
+	 * @param filesToTrain
+	 * @param filesToPredict
+	 */
+	public static void getFilesByPercentage(Integer percentage, List<File> filesToTrain, List<File> filesToPredict){
+		
+		List<File> allFiles = new ArrayList<File>(filesToTrain);
+		filesToTrain.clear();
+		
+		Integer nFilesToTrain = allFiles.size() * percentage / 100;
+		
+		Collections.shuffle(allFiles);
+		
+		filesToTrain.addAll(allFiles.subList(0, nFilesToTrain));
+		filesToPredict.addAll(allFiles.subList(nFilesToTrain, allFiles.size()));
+		
 	}
 
 }

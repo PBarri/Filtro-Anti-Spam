@@ -4,12 +4,11 @@ import java.io.File;
 import java.util.prefs.Preferences;
 
 import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
@@ -17,12 +16,11 @@ import javafx.util.StringConverter;
 
 import org.controlsfx.dialog.Dialogs;
 
+import tasks.TrainPredictTask;
 import tasks.TrainTask;
 import algorithms.NaiveBayes;
 import application.MainApplication;
-import exceptions.InvalidPathException;
 import exceptions.NotTrainedException;
-import exceptions.NotValidPercentageException;
 import exceptions.OpenFileException;
 
 @SuppressWarnings("deprecation")
@@ -101,44 +99,38 @@ public class HomeController {
 	@FXML
 	private void train(){
 		NaiveBayes alg = mainApplication.getAlg();
-		TrainTask trainTask = new TrainTask(mainApplication, trainPath.getText());
-		Thread t = new Thread(trainTask);
-		t.setDaemon(true);
-		Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Entrenando").masthead(null).showWorkerProgress(trainTask);
-		trainTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-			
-			@Override
-			public void handle(WorkerStateEvent event) {
-				mainApplication.setAlg(alg);
-				mainApplication.getPrimaryStage().setTitle("Filtro Anti-Spam - Nuevo[Sin guardar]");
-				if(new Double(slider.getValue()).intValue() != 100){
-					mainApplication.showTrainPredictData();
-				}else{
-					mainApplication.showNaiveBayesData();
-				}		
+		Integer percentage = new Double(slider.getValue()).intValue();
+		Task<Void> task;
+		if(percentage != 100){
+			if(percentage < 20){
+				Dialogs.create().title("Error").masthead(null).message("El porcentaje de correos dedicado al entrenamiento no puede ser menor que 20").showError();
+				return;
+			}else{
+				task = new TrainPredictTask(mainApplication, trainPath.getText(), percentage);
+				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent event) {
+						mainApplication.setAlg(alg);
+						mainApplication.getPrimaryStage().setTitle("Filtro Anti-Spam - Nuevo[Sin guardar]");
+						mainApplication.showTrainPredictData();
+					}
+				});
 			}
-		});
-		
+		}else{
+			task = new TrainTask(mainApplication, trainPath.getText());
+			task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {				
+				@Override
+				public void handle(WorkerStateEvent event) {
+					mainApplication.setAlg(alg);
+					mainApplication.getPrimaryStage().setTitle("Filtro Anti-Spam - Nuevo[Sin guardar]");
+					mainApplication.showNaiveBayesData();
+				}
+			});
+		}		
+		Thread t = new Thread(task);
+		t.setDaemon(true);
+		Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Entrenando").masthead(null).showWorkerProgress(task);		
 		t.start();
-/*		try {
-			alg.train(trainPath.getText(), new Double(slider.getValue()).intValue());
-		} catch (NullPointerException e) {
-			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
-			return;
-		} catch (InvalidPathException e) {
-			Dialogs.create().title("Error").masthead("Ruta inválida").message(e.getMessage()).showError();
-			return;
-		} catch (OpenFileException e) {
-			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
-			return;
-		} catch (NotValidPercentageException e) {
-			Dialogs.create().title("Error").masthead(null).message("El porcentaje no puede ser menor que el 20%").showError();
-			return;
-		} catch (Exception e) {
-			e.printStackTrace();
-			Dialogs.create().title("Error").masthead(null).message("Se ha producido un error").showError();
-			return;
-		}*/
 	}
 	
 	@FXML

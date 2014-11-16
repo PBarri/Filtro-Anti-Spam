@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javafx.concurrent.Task;
+import model.Prediction;
 import model.Probability;
 
 import org.controlsfx.dialog.Dialogs;
@@ -17,24 +18,28 @@ import algorithms.NaiveBayes;
 import application.MainApplication;
 
 @SuppressWarnings("deprecation")
-public class TrainTask extends Task<Void> {
-
+public class TrainPredictTask extends Task<Void> {
+	
 	private static final String SPAM = "spam";
 	private static final String HAM = "ham";
 	
 	private final MainApplication mainApplication;
 	private final String path;
+	private final Integer percentage;
 	
-	public TrainTask(MainApplication app, String path){
-		this.mainApplication = app;
+	public TrainPredictTask(MainApplication mainApplication, String path, Integer percentage) {
+		this.mainApplication = mainApplication;
 		this.path = path;
+		this.percentage = percentage;
 	}
-	
+
+
 	@Override
 	protected Void call() throws Exception {
-		updateTitle("Entrenando");		
+		updateTitle("Entrenando");
 		File file;
 		List<File> filesToAnalize = new ArrayList<File>();
+		List<File> filesToPredict = new ArrayList<File>();
 		
 		file = new File(path);
 		
@@ -45,9 +50,12 @@ public class TrainTask extends Task<Void> {
 			this.cancel();
 		}
 		
+		Utils.getFilesByPercentage(percentage, filesToAnalize, filesToPredict);
+		
 		// Cogemos las variables del algoritmo que necesitaremos
 		NaiveBayes alg = mainApplication.getAlg();
 		alg.setnDocuments(filesToAnalize.size());
+		alg.setnPredictDocuments(filesToPredict.size());
 		Integer totalWords = alg.getTotalWords();
 		Set<String> vocabulary = alg.getVocabulary();
 		Map<String, Integer> spamWords = alg.getSpamWords();
@@ -58,7 +66,16 @@ public class TrainTask extends Task<Void> {
 		Integer nHamWords = hamWords.keySet().size();
 		Integer nSpamWords = spamWords.keySet().size();
 		Integer noRepeatingWords = nHamWords + nSpamWords;
+		// Predicción
 		Map<String, List<Float>> probabilities = alg.getProbabilities();
+		Map<String, List<Float>> predictResults = alg.getPredictResults();
+		Integer nPredictDocuments = 0;
+		Integer nPredictSpamDocuments = 0;
+		Integer nPredictHamDocuments = 0;
+		Integer wellAnalized = 0;
+		Integer badAnalized = 0;
+		
+		// Ejecutamos el entrenamiento
 		
 		updateMessage("Analizando las palabras contenidas en los correos... 0%");
 		
@@ -166,8 +183,6 @@ public class TrainTask extends Task<Void> {
 			cont++;
 		}
 		
-		// Metemos en alg todos los cambios hechos
-		
 		alg.setPath(path);
 		alg.setnSpamDocuments(nSpamDocuments);
 		alg.setnHamDocuments(nHamDocuments);
@@ -178,6 +193,93 @@ public class TrainTask extends Task<Void> {
 		alg.setInitHamProb(Math.abs(new Float(Math.log10(nHamDocuments.doubleValue() / nDocuments))));
 		alg.setInitSpamProb(Math.abs(new Float(Math.log10(nSpamDocuments.doubleValue() / nDocuments))));
 		
+		// Ejecutamos la predicción
+		
+		predictResults.clear();
+		cont = 0;
+		updateMessage("Realizando la predicción... 0%");
+		for(File f : filesToPredict){
+			// Inicializamos las probabilidades a las iniciales del algoritmo
+			Float totalSpamProb = alg.getInitSpamProb();
+			Float totalHamProb = alg.getInitHamProb();
+			// Inicializamos una lista que contendrá las probabilidades finales
+			List<Float> results = new ArrayList<Float>();
+			
+			// Cargamos las palabras contenidas en el correo
+			String[] fileWords = Utils.loadWords(f);
+			for (String s : fileWords) {
+				if (probabilities.containsKey(s)) {
+					Float tempSpamProb = Math.abs(new Float(Math.log10(probabilities.get(s).get(0))));
+					Float tempHamProb = Math.abs(new Float(Math.log10(probabilities.get(s).get(1))));
+					totalSpamProb += tempSpamProb;
+					totalHamProb += tempHamProb;
+				}
+			}
+			results.add(totalSpamProb);
+			results.add(totalHamProb);
+			switch (totalSpamProb.compareTo(totalHamProb)) {
+			case 1: // Clasificado como SPAM
+				results.add(new Float(1));
+				break;
+			case 0: // Error al clasificar
+				results.add(new Float(0));
+				break;
+			case -1: // Clasificado como HAM
+				results.add(new Float(2));
+				break;
+			}
+			// Aumentamos el número de archivos que el algoritmo ha predecido como spam o ham, respectivamente
+			if (f.getParentFile().getName().equals(SPAM)) {
+				nPredictSpamDocuments++;
+				results.add(new Float(1));
+			} else if (f.getParentFile().getName().equals(HAM)) {
+				nPredictHamDocuments++;
+				results.add(new Float(2));
+			}
+				
+			// Comprobamos si el algoritmo de predicción ha dado resultado o no
+			if (results.get(2).equals(results.get(3))) {
+				wellAnalized++;
+			} else {
+				badAnalized++;
+			}
+			
+			// Introducimos los resultados en el mapa que se mostrará luego en la interfaz
+			predictResults.put(f.getName(), results);
+			
+			Integer perc = (int) Math.round((cont.doubleValue() / nPredictDocuments) * 100);
+			updateMessage("Realizando la predicción... " + perc + "%");
+			updateProgress(cont.doubleValue(), nPredictDocuments.doubleValue());
+			cont++;
+		}
+		
+		List<Prediction> predictionList = new ArrayList<Prediction>();
+		
+		cont = 0;
+		updateMessage("Analizando datos... 0%");
+		for(Entry<String, List<Float>> entry : predictResults.entrySet()){
+			Prediction p = new Prediction();
+			List<String> aux = Utils.convertPredictions(entry.getValue());
+			p.setFilename(entry.getKey());
+			p.setSpamProbability(aux.get(0));
+			p.setHamProbability(aux.get(1));
+			p.setCategory(aux.get(2));
+			p.setRealCategory(aux.get(3));
+			predictionList.add(p);
+			
+			Integer perc = (int) Math.round((cont.doubleValue() / nPredictDocuments) * 100);
+			updateMessage("Analizando datos... " + perc + "%");
+			updateProgress(cont.doubleValue(), nPredictDocuments.doubleValue());
+			cont++;
+		}
+		
+		alg.setPredictResults(predictResults);
+		alg.setnSpamDocuments(nSpamDocuments);
+		alg.setnHamDocuments(nHamDocuments);
+		alg.setWellAnalized(wellAnalized);
+		alg.setBadAnalized(badAnalized);
+		alg.setPredictionList(predictionList);
+		
 		return null;
 	}
 
@@ -187,6 +289,10 @@ public class TrainTask extends Task<Void> {
 
 	public String getPath() {
 		return path;
+	}
+
+	public Integer getPercentage() {
+		return percentage;
 	}
 
 }
