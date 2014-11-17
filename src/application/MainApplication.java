@@ -6,6 +6,7 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -53,6 +54,7 @@ public class MainApplication extends Application {
 		this.primaryStage.setTitle("Filtro Anti Spam");
 		this.primaryStage.setMinHeight(600);
 		this.primaryStage.setMinWidth(600);
+		this.primaryStage.getIcons().add(new Image("file:resources/css/ico.png"));
 		
 		initMainWindow();
 		showHome(true);
