@@ -16,12 +16,11 @@ import javafx.util.StringConverter;
 
 import org.controlsfx.dialog.Dialogs;
 
+import tasks.PredictTask;
 import tasks.TrainPredictTask;
 import tasks.TrainTask;
 import algorithms.NaiveBayes;
 import application.MainApplication;
-import exceptions.NotTrainedException;
-import exceptions.OpenFileException;
 
 @SuppressWarnings("deprecation")
 public class HomeController {
@@ -126,7 +125,14 @@ public class HomeController {
 					mainApplication.showNaiveBayesData();
 				}
 			});
-		}		
+		}
+		task.setOnFailed(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent arg0) {
+				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+				return;
+			}
+		});
 		Thread t = new Thread(task);
 		t.setDaemon(true);
 		Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Entrenando").masthead(null).showWorkerProgress(task);		
@@ -153,19 +159,33 @@ public class HomeController {
 	@FXML
 	private void predict(){
 		NaiveBayes alg = mainApplication.getAlg();
+		if(alg.getProbabilities().isEmpty()){
+			Dialogs.create().title("Error").masthead(null).message("Debe entrenar un conjunto de correos antes de clasificar").showError();
+			return;
+		}
 		try {
-			alg.predict(predictPath.getText());
-		} catch (OpenFileException e) {
-			Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
-			return;
-		} catch (NotTrainedException e) {
-			Dialogs.create().title("Error").masthead("Entrenamiento erróneo").message("Debe entrenar un conjunto de correos antes de clasificar").showError();
-			return;
+			Task<Void> task = new PredictTask(mainApplication, predictPath.getText());
+			task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent event) {
+					mainApplication.setAlg(alg);
+					mainApplication.showPredictions();
+				}
+			});
+			task.setOnFailed(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent event) {
+					Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+					return;
+				}
+			});
+			Thread t = new Thread(task);
+			t.setDaemon(true);
+			Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Prediciendo").masthead(null).showWorkerProgress(task);
+			t.start();
 		} catch (Exception e) {
 			Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
 			return;
 		}
-		this.mainApplication.setAlg(alg);
-		this.mainApplication.showPredictions();
 	}
 }

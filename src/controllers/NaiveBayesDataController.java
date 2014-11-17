@@ -5,6 +5,9 @@ import java.util.prefs.Preferences;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -16,8 +19,7 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 
-import exceptions.NotTrainedException;
-import exceptions.OpenFileException;
+import tasks.PredictTask;
 import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
@@ -127,19 +129,29 @@ public class NaiveBayesDataController {
 			pref.put("predictDirectory", file.getAbsolutePath());
 			NaiveBayes alg = mainApplication.getAlg();
 			try {
-				alg.predict(file.getAbsolutePath());
-			} catch (OpenFileException e) {
-				Dialogs.create().title("Error").masthead("Archivo erróneo").message(e.getMessage()).showError();
-				return;
-			} catch (NotTrainedException e) {
-				Dialogs.create().title("Error").masthead("Entrenamiento erróneo").message("Debe entrenar un conjunto de correos antes de clasificar").showError();
-				return;
+				Task<Void> task = new PredictTask(mainApplication, file.getAbsolutePath());
+				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent event) {
+						mainApplication.setAlg(alg);
+						mainApplication.showPredictions();
+					}
+				});
+				task.setOnFailed(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent arg0) {
+						Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+						return;
+					}
+				});
+				Thread t = new Thread(task);
+				t.setDaemon(true);
+				Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Prediciendo").masthead(null).showWorkerProgress(task);
+				t.start();
 			} catch (Exception e) {
 				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
 				return;
 			}
-			this.mainApplication.setAlg(alg);
-			this.mainApplication.showPredictions();
 		}
 	}
 	
