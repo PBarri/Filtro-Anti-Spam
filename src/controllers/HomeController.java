@@ -8,9 +8,11 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.DirectoryChooser;
 import javafx.util.StringConverter;
 
@@ -19,6 +21,7 @@ import org.controlsfx.dialog.Dialogs;
 import tasks.PredictTask;
 import tasks.TrainPredictTask;
 import tasks.TrainTask;
+import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 
@@ -102,7 +105,9 @@ public class HomeController {
 		Task<Void> task;
 		if(percentage != 100){
 			if(percentage < 20){
-				Dialogs.create().title("Error").masthead(null).message("El porcentaje de correos dedicado al entrenamiento no puede ser menor que 20").showError();
+				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "El porcentaje de correos dedicado al entrenamiento no puede ser menor que 20", null, mainApplication);
+				//Dialogs.create().title("Error").masthead(null).message("El porcentaje de correos dedicado al entrenamiento no puede ser menor que 20").showError();
+				alert.showAndWait();
 				return;
 			}else{
 				task = new TrainPredictTask(mainApplication, trainPath.getText(), percentage);
@@ -129,7 +134,9 @@ public class HomeController {
 		task.setOnFailed(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent arg0) {
-				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error. Por favor inténtelo de nuevo", null, mainApplication);
+				//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").owner(mainApplication.getPrimaryStage()).showError();
+				alert.showAndWait();
 				return;
 			}
 		});
@@ -160,7 +167,9 @@ public class HomeController {
 	private void predict(){
 		NaiveBayes alg = mainApplication.getAlg();
 		if(alg.getProbabilities().isEmpty()){
-			Dialogs.create().title("Error").masthead(null).message("Debe entrenar un conjunto de correos antes de clasificar").showError();
+			Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Debe entrenar un conjunto de correos antes de clasificar", null, mainApplication);
+			//Dialogs.create().title("Error").masthead(null).message("Debe entrenar un conjunto de correos antes de clasificar").showError();
+			alert.showAndWait();
 			return;
 		}
 		try {
@@ -175,7 +184,9 @@ public class HomeController {
 			task.setOnFailed(new EventHandler<WorkerStateEvent>() {
 				@Override
 				public void handle(WorkerStateEvent event) {
-					Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+					Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error. Por favor inténtelo de nuevo", null, mainApplication);
+					//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+					alert.showAndWait();
 					return;
 				}
 			});
@@ -184,7 +195,9 @@ public class HomeController {
 			Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Prediciendo").masthead(null).showWorkerProgress(task);
 			t.start();
 		} catch (Exception e) {
-			Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+			Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error. Por favor inténtelo de nuevo", null, mainApplication);
+			//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+			alert.showAndWait();
 			return;
 		}
 	}

@@ -54,7 +54,7 @@ public class MainApplication extends Application {
 		this.primaryStage.setTitle("Filtro Anti Spam");
 		this.primaryStage.setMinHeight(600);
 		this.primaryStage.setMinWidth(600);
-		this.primaryStage.getIcons().add(new Image("file:resources/css/ico.png"));
+		this.primaryStage.getIcons().add(new Image("/css/ico.png"));
 		
 		initMainWindow();
 		showHome(true);

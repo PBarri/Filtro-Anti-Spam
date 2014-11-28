@@ -3,10 +3,14 @@ package controllers;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 
 import javax.xml.bind.JAXBContext;
@@ -15,15 +19,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import model.Probability;
-
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
-
+import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 
-@SuppressWarnings("deprecation")
 public class MainApplicationController {
 
 	private MainApplication mainApplication;
@@ -52,16 +51,24 @@ public class MainApplicationController {
 		mensaje += "Autores de la aplicación: \n";
 		mensaje += "	Pablo Barrientos Lobato\n";
 		mensaje += "	Alberto Salas Cantalejo";
-		Dialogs.create().title("Acerca de...").masthead("Filtro Anti-Spam").message(mensaje).showInformation();
+		Alert alert = Utils.createAlert(AlertType.INFORMATION, "Acerca de...", mensaje, "Filtro Anti-Spam", mainApplication);
+		//Dialogs.create().title("Acerca de...").masthead("Filtro Anti-Spam").message(mensaje).showInformation();
+		alert.showAndWait();
 	}
 
 	@FXML
 	private void newTraining() {
-		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea crear un nuevo entrenamiento?\nPerderá todos los datos no guardados").showConfirm();
-		if (response.equals(Dialog.ACTION_YES)) {
+		Alert alert = Utils.createAlert(AlertType.CONFIRMATION, "Confirmar acción", "¿Desea crear un nuevo entrenamiento?\nPerderá los datos no guardados", null, mainApplication);
+		Optional<ButtonType> response = alert.showAndWait();
+		if(response.get().equals(ButtonType.OK)){
 			this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam");
 			this.mainApplication.showHome(true);
 		}
+//		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea crear un nuevo entrenamiento?\nPerderá todos los datos no guardados").showConfirm();
+//		if (response.equals(Dialog.ACTION_YES)) {
+//			this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam");
+//			this.mainApplication.showHome(true);
+//		}
 	}
 
 	@FXML
@@ -72,10 +79,14 @@ public class MainApplicationController {
 			try {
 				saveFile(mainApplication.getFilePath());
 			} catch (NullPointerException e) {
-				Dialogs.create().title("Error").masthead(null).message("No es un archivo .xml").showError();
+				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "No es un archivo .xml", null, mainApplication);
+				alert.showAndWait();
+				//Dialogs.create().title("Error").masthead(null).message("No es un archivo .xml").showError();
 				return;
 			} catch (JAXBException e) {
-				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al guardar el entrenamiento").showError();
+				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error al guardar el entrenamiento", null, mainApplication);
+				alert.showAndWait();
+				//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al guardar el entrenamiento").showError();
 				return;
 			}
 		}
@@ -92,10 +103,14 @@ public class MainApplicationController {
 		try {
 			saveFile(file);
 		} catch (NullPointerException e) {
-			Dialogs.create().title("Error").masthead(null).message("No es un archivo .xml").showError();
+			Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "No es un archivo .xml", null, mainApplication);
+			alert.showAndWait();
+			//Dialogs.create().title("Error").masthead(null).message("No es un archivo .xml").showError();
 			return;
 		} catch (JAXBException e) {
-			Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al guardar el entrenamiento").showError();
+			Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error al guardar el entrenamiento", null, mainApplication);
+			alert.showAndWait();
+			//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al guardar el entrenamiento").showError();
 			return;
 		}
 	}
@@ -137,7 +152,9 @@ public class MainApplicationController {
 				this.mainApplication.showNaiveBayesData();
 				this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam - " + file.getName());
 			} catch (JAXBException e) {
-				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al cargar el entrenamiento").showError();
+				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error al cargar el entrenamiento", null, mainApplication);
+				alert.showAndWait();
+				//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error al cargar el entrenamiento").showError();
 				return;
 			}
 		}
@@ -146,7 +163,9 @@ public class MainApplicationController {
 	@FXML
 	public void seeTraining(){
 		if(mainApplication.getAlg().getProbabilities().isEmpty()){
-			Dialogs.create().title("Error").masthead(null).message("No existe ningún conjunto de entrenamiento").showError();
+			Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "No existe ningún conjunto de entrenamiento", null, mainApplication);
+			alert.showAndWait();
+			//Dialogs.create().title("Error").masthead(null).message("No existe ningún conjunto de entrenamiento").showError();
 		}else{
 			mainApplication.showNaiveBayesData();
 		}

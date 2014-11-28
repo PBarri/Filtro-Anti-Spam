@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import javafx.collections.FXCollections;
@@ -9,14 +10,15 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.DirectoryChooser;
 import model.Probability;
 
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 
 import tasks.PredictTask;
@@ -107,11 +109,17 @@ public class NaiveBayesDataController {
 	
 	@FXML
 	public void newTrain(){
-		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea crear un nuevo entrenamiento?\nPerderá todos los datos no guardados").showConfirm();
-		if (response.equals(Dialog.ACTION_YES)) {
+		Alert alert = Utils.createAlert(AlertType.CONFIRMATION, "Confirmar acción", "¿Desea crear un nuevo entrenamiento?\nPerderá todos los datos no guardados", null, mainApplication);
+		Optional<ButtonType> response = alert.showAndWait();
+		if(response.get().equals(ButtonType.OK)){
 			this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam");
 			this.mainApplication.showHome(true);
 		}
+//		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea crear un nuevo entrenamiento?\nPerderá todos los datos no guardados").showConfirm();
+//		if (response.equals(Dialog.ACTION_YES)) {
+//			this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam");
+//			this.mainApplication.showHome(true);
+//		}
 	}
 	
 	@FXML
@@ -140,7 +148,9 @@ public class NaiveBayesDataController {
 				task.setOnFailed(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent arg0) {
-						Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+						Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error. Por favor inténtelo de nuevo", null, mainApplication);
+						alert.showAndWait();
+						//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
 						return;
 					}
 				});
@@ -149,7 +159,9 @@ public class NaiveBayesDataController {
 				Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Prediciendo").masthead(null).showWorkerProgress(task);
 				t.start();
 			} catch (Exception e) {
-				Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
+				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error. Por favor inténtelo de nuevo", null, mainApplication);
+				alert.showAndWait();
+				//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
 				return;
 			}
 		}

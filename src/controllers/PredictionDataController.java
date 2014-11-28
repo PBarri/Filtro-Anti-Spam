@@ -1,12 +1,13 @@
 package controllers;
 
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -15,7 +16,6 @@ import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 
-@SuppressWarnings("deprecation")
 public class PredictionDataController {
 	
 	private MainApplication mainApplication;
@@ -93,10 +93,14 @@ public class PredictionDataController {
 	
 	@FXML
 	public void back(){
-		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea volver atrás?\nPerderá los datos de la predicción").showConfirm();
-		if(response.equals(Dialog.ACTION_YES)){
+		Alert alert = Utils.createAlert(AlertType.CONFIRMATION, "Confirmar acción", "¿Desea volver atrás?\nPerderá los datos de la predicción", null, mainApplication);
+		Optional<ButtonType> response = alert.showAndWait();
+		if(response.get().equals(ButtonType.OK))
 			this.mainApplication.showNaiveBayesData();
-		}
+//		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea volver atrás?\nPerderá los datos de la predicción").showConfirm();
+//		if(response.equals(Dialog.ACTION_YES)){
+//			this.mainApplication.showNaiveBayesData();
+//		}
 	}
 
 }

@@ -9,16 +9,14 @@ import java.util.Set;
 
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import model.Prediction;
 import model.Probability;
-
-import org.controlsfx.dialog.Dialogs;
-
 import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
 
-@SuppressWarnings("deprecation")
 public class TrainPredictTask extends Task<Void> {
 
 	private static final String SPAM = "spam";
@@ -48,8 +46,9 @@ public class TrainPredictTask extends Task<Void> {
 			if (file.isDirectory()) {
 				Utils.iterateDirectories(file, filesToAnalize);
 			} else {
-				Dialogs.create().title("Error").masthead(null)
-						.message("Ruta inválida").showError();
+				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Ruta inválida", null, mainApplication);
+				alert.showAndWait();
+				//Dialogs.create().title("Error").masthead(null).message("Ruta inválida").showError();
 				this.cancel();
 			}
 

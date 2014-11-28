@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
+import application.MainApplication;
+
 import com.google.common.io.Files;
 
 import exceptions.OpenFileException;
@@ -118,6 +124,18 @@ public class Utils {
 		filesToTrain.addAll(allFiles.subList(0, nFilesToTrain));
 		filesToPredict.addAll(allFiles.subList(nFilesToTrain, allFiles.size()));
 		
+	}
+	
+	public static Alert createAlert(AlertType type, String title, String content, String head, MainApplication app){
+		Alert alert = new Alert(type);
+		alert.setTitle(title);
+		alert.setContentText(content);
+		alert.setHeaderText(null);
+		
+		Stage stage = (Stage) (alert.getDialogPane().getScene().getWindow());
+		stage.getIcons().add(new Image("/css/ico.png"));
+		
+		return alert;
 	}
 
 }
