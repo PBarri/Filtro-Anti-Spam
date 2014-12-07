@@ -25,10 +25,17 @@ import tasks.PredictTask;
 import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
-
+/**
+ * Clase controladora de la pantalla de datos del entrenamiento
+ * 
+ * @author Pablo Barrientos Lobato
+ * @author Alberto Salas Cantalejo
+ *
+ */
 @SuppressWarnings("deprecation")
 public class NaiveBayesDataController {
 
+	// Referencia a la aplicación
 	private MainApplication mainApplication;
 	
 	// Lista para ver las probabilidades
@@ -71,8 +78,12 @@ public class NaiveBayesDataController {
 		
 	}
 	
+	/**
+	 * Método que se ejecuta al inicializar el controlador
+	 */
 	@FXML
 	private void initialize(){
+		// Se rellena la tabla con los datos de las probabilidades
 		wordColumn.setCellValueFactory(cellData -> cellData.getValue().getWord());
 		spamColumn.setCellValueFactory(cellData -> cellData.getValue().getSpamProbability());
 		hamColumn.setCellValueFactory(cellData -> cellData.getValue().getHamProbability());
@@ -92,6 +103,10 @@ public class NaiveBayesDataController {
 		table.setItems(probabilitiesData);
 	}
 	
+	/**
+	 * Método que rellena la interfaz con los datos del algoritmo
+	 * @param alg Instancia del algoritmo que ha sido entrenado
+	 */
 	public void getAlgorithmData(NaiveBayes alg){
 		this.rootPathLabel.setText(alg.getPath());
 		this.nDocumentsLabel.setText(alg.getnDocuments().toString());
@@ -102,11 +117,18 @@ public class NaiveBayesDataController {
 		this.initHamProb.setText(Utils.getPercentage(alg.getInitHamProb(), null));
 	}
 	
+	/**
+	 * Método que se ejecuta al pulsar el botón de Atrás.
+	 * Este método vuelve a la pantalla de inicio.
+	 */
 	@FXML
 	public void back(){
 		mainApplication.showHome(false);
 	}
 	
+	/**
+	 * Método que se ejecuta al pulsar el botón de Nuevo Entrenamiento
+	 */
 	@FXML
 	public void newTrain(){
 		Alert alert = Utils.createAlert(AlertType.CONFIRMATION, "Confirmar acción", "¿Desea crear un nuevo entrenamiento?\nPerderá todos los datos no guardados", null, mainApplication);
@@ -115,13 +137,12 @@ public class NaiveBayesDataController {
 			this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam");
 			this.mainApplication.showHome(true);
 		}
-//		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea crear un nuevo entrenamiento?\nPerderá todos los datos no guardados").showConfirm();
-//		if (response.equals(Dialog.ACTION_YES)) {
-//			this.mainApplication.getPrimaryStage().setTitle("Filtro Anti Spam");
-//			this.mainApplication.showHome(true);
-//		}
 	}
 	
+	/**
+	 * Método que se ejecuta al pulsar el botón de predecir. Este método pide al usuario una ruta de un
+	 * directorio para usar esos datos para una predicción.
+	 */
 	@FXML
 	public void predict(){
 		Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
@@ -136,34 +157,26 @@ public class NaiveBayesDataController {
 		if(file != null){
 			pref.put("predictDirectory", file.getAbsolutePath());
 			NaiveBayes alg = mainApplication.getAlg();
-			try {
-				Task<Void> task = new PredictTask(mainApplication, file.getAbsolutePath());
-				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						mainApplication.setAlg(alg);
-						mainApplication.showPredictions();
-					}
-				});
-				task.setOnFailed(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent arg0) {
-						Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error. Por favor inténtelo de nuevo", null, mainApplication);
-						alert.showAndWait();
-						//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
-						return;
-					}
-				});
-				Thread t = new Thread(task);
-				t.setDaemon(true);
-				Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Prediciendo").masthead(null).showWorkerProgress(task);
-				t.start();
-			} catch (Exception e) {
-				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error. Por favor inténtelo de nuevo", null, mainApplication);
-				alert.showAndWait();
-				//Dialogs.create().title("Error").masthead(null).message("Se ha producido un error. Por favor inténtelo de nuevo").showError();
-				return;
-			}
+			Task<Void> task = new PredictTask(mainApplication, file.getAbsolutePath());
+			task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent event) {
+					mainApplication.setAlg(alg);
+					mainApplication.showPredictions();
+				}
+			});
+			task.setOnFailed(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Se ha producido un error. Por favor inténtelo de nuevo", null, mainApplication);
+					alert.showAndWait();
+					return;
+				}
+			});
+			Thread t = new Thread(task);
+			t.setDaemon(true);
+			Dialogs.create().owner(mainApplication.getPrimaryStage()).title("Prediciendo").masthead(null).showWorkerProgress(task);
+			t.start();
 		}
 	}
 	

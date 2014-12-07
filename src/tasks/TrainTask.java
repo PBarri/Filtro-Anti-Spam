@@ -15,7 +15,16 @@ import model.Probability;
 import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
-
+/**
+ * Clase que ejecuta un entrenamiento como Task.
+ * Al ejecutarse en segundo plano impide que la aplicación se quede bloqueada.
+ * 
+ * @see NaiveBayes#train(String, Integer)
+ * 
+ * @author Pablo Barrientos Lobato
+ * @author Alberto Salas Cantalejo
+ *
+ */
 public class TrainTask extends Task<Void> {
 
 	private static final String SPAM = "spam";
@@ -23,10 +32,12 @@ public class TrainTask extends Task<Void> {
 
 	private final MainApplication mainApplication;
 	private final String path;
+	private final Integer threshold;
 
-	public TrainTask(MainApplication app, String path) {
+	public TrainTask(MainApplication app, String path, Integer threshold) {
 		this.mainApplication = app;
 		this.path = path;
+		this.threshold = threshold;
 	}
 
 	@Override
@@ -44,7 +55,6 @@ public class TrainTask extends Task<Void> {
 			} else {
 				Alert alert = Utils.createAlert(AlertType.ERROR, "Error", "Ruta inválida", null, mainApplication);
 				alert.showAndWait();
-				//Dialogs.create().title("Error").masthead(null).message("Ruta inválida").showError();
 				this.cancel();
 			}
 
@@ -76,7 +86,9 @@ public class TrainTask extends Task<Void> {
 						if (!vocabulary.contains(s)) {
 							vocabulary.add(s);
 						}
-						spamWords.put(s, spamWords.getOrDefault(s, 0) + 1);
+						if(spamWords.getOrDefault(s, 0) <= threshold){
+							spamWords.put(s, spamWords.getOrDefault(s, 0) + 1);
+						}
 					}
 				} else if (f.getParentFile().getName().equals(HAM)) {
 					// Contamos el número de correos que son ham
@@ -85,15 +97,18 @@ public class TrainTask extends Task<Void> {
 						if (!vocabulary.contains(s)) {
 							vocabulary.add(s);
 						}
-						hamWords.put(s, hamWords.getOrDefault(s, 0) + 1);
+						if(hamWords.getOrDefault(s, 0) <= threshold){
+							hamWords.put(s, hamWords.getOrDefault(s, 0) + 1);
+						}
 					}
 				}
-				Integer perc = (int) Math
-						.round((i.doubleValue() / nDocuments) * 100);
+				Integer perc = (int) Math.round((i.doubleValue() / nDocuments) * 100);
 				updateProgress(i.doubleValue(), nDocuments.doubleValue());
-				updateMessage("Analizando las palabras contenidas en los correos... "
-						+ perc + "%");
+				updateMessage("Analizando las palabras contenidas en los correos... "+ perc + "%");
 			}
+			
+			spamWords = Utils.filterMap(spamWords);
+			hamWords = Utils.filterMap(hamWords);
 
 			updateMessage("Generando probabilidades para cada palabra... 0%");
 
@@ -109,20 +124,15 @@ public class TrainTask extends Task<Void> {
 					break;
 				List<Float> aux = new ArrayList<Float>();
 				// Calculamos la probabilidad de que la palabra sea spam
-				prob = (entry.getValue().floatValue() + 1)
-						/ (totalWords + vocabulary.size());
+				prob = (entry.getValue().floatValue() + 1) / (totalWords + vocabulary.size());
 				aux.add(0, prob);
-				// Añadimos una probabilidad 1 de que no sea spam (por si no
-				// aparece
-				// en el otro mapa. 1 porque el logaritmo de 1 es 0)
+				// Añadimos la probabilidad como si no estuviera contenido en ham
 				aux.add(1, new Float(1.0));
 				probabilities.put(entry.getKey(), aux);
 
-				Integer perc = (int) Math
-						.round((cont.doubleValue() / noRepeatingWords) * 100);
+				Integer perc = (int) Math.round((cont.doubleValue() / noRepeatingWords) * 100);
 				updateProgress(cont.doubleValue(), noRepeatingWords);
-				updateMessage("Generando probabilidades para cada palabra... "
-						+ perc + "%");
+				updateMessage("Generando probabilidades para cada palabra... "+ perc + "%");
 				cont++;
 			}
 
@@ -133,8 +143,7 @@ public class TrainTask extends Task<Void> {
 				}
 				List<Float> aux = new ArrayList<Float>();
 				// Calculamos la probabilidad de que la palabra sea ham
-				prob = entry.getValue().floatValue()
-						/ (totalWords + vocabulary.size());
+				prob = (entry.getValue().floatValue() + 1) / (totalWords + vocabulary.size());
 				// Apareció en el mapa de palabras spam
 				if (probabilities.containsKey(entry.getKey())) {
 					aux = probabilities.get(entry.getKey());
@@ -146,11 +155,9 @@ public class TrainTask extends Task<Void> {
 				}
 				probabilities.put(entry.getKey(), aux);
 
-				Integer perc = (int) Math
-						.round((cont.doubleValue() / noRepeatingWords) * 100);
+				Integer perc = (int) Math.round((cont.doubleValue() / noRepeatingWords) * 100);
 				updateProgress(cont.doubleValue(), noRepeatingWords);
-				updateMessage("Generando probabilidades para cada palabra... "
-						+ perc + "%");
+				updateMessage("Generando probabilidades para cada palabra... "+ perc + "%");
 				cont++;
 			}
 
@@ -168,8 +175,7 @@ public class TrainTask extends Task<Void> {
 				Probability p = new Probability(word, spamP, hamP);
 				probabilitiesList.add(p);
 
-				Integer perc = (int) Math
-						.round((cont.doubleValue() / probSize) * 100);
+				Integer perc = (int) Math.round((cont.doubleValue() / probSize) * 100);
 				updateMessage("Analizando datos... " + perc + "%");
 				updateProgress(cont.doubleValue(), probSize.doubleValue());
 				cont++;
@@ -184,10 +190,8 @@ public class TrainTask extends Task<Void> {
 			alg.setProbabilities(probabilities);
 			alg.setVocabulary(vocabulary);
 			alg.setProbabilitiesList(probabilitiesList);
-			alg.setInitHamProb(Math.abs(new Float(Math.log10(nHamDocuments
-					.doubleValue() / nDocuments))));
-			alg.setInitSpamProb(Math.abs(new Float(Math.log10(nSpamDocuments
-					.doubleValue() / nDocuments))));
+			alg.setInitHamProb(Math.abs(new Float(Math.log10(nHamDocuments.doubleValue() / nDocuments))));
+			alg.setInitSpamProb(Math.abs(new Float(Math.log10(nSpamDocuments.doubleValue() / nDocuments))));
 
 		} catch (Exception e) {
 			fireEvent(new WorkerStateEvent(this, WorkerStateEvent.WORKER_STATE_FAILED));

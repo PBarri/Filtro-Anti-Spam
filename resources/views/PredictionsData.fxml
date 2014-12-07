@@ -28,7 +28,7 @@
                               </Pane>
             						<GridPane prefHeight="194.0" prefWidth="401.0" HBox.hgrow="ALWAYS">
             							<columnConstraints>
-            								<ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="157.0" />
+            								<ColumnConstraints maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="250.0" />
             								<ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="258.0" />
             							</columnConstraints>
             							<rowConstraints>
@@ -45,17 +45,17 @@
             										<Font name="System Bold" size="12.0" />
             									</font>
             								</Label>
-            								<Label text="Nº de documentos SPAM" GridPane.rowIndex="1">
+            								<Label text="Nº de documentos SPAM / HAM" GridPane.rowIndex="1">
             									<font>
             										<Font name="System Bold" size="12.0" />
             									</font>
             								</Label>
-            								<Label text="Nº de documentos HAM" GridPane.rowIndex="2">
+            								<Label text="Documentos bien / mal analizados" GridPane.rowIndex="2">
             									<font>
             										<Font name="System Bold" size="12.0" />
             									</font>
             								</Label>
-            								<Label text="Documentos bien analizados" GridPane.rowIndex="3">
+            								<Label text="Documentos bien / mal analizados SPAM" GridPane.rowIndex="3">
             									<font>
             										<Font name="System Bold" size="12.0" />
             									</font>
@@ -68,60 +68,95 @@
                                           <Insets left="15.0" />
                                        </GridPane.margin>
             								</Label>
-            								<Label fx:id="spamDocuments" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
-            									<font>
-            										<Font name="System Bold" size="12.0" />
-            									</font>
-                                       <GridPane.margin>
-                                          <Insets left="15.0" />
-                                       </GridPane.margin>
-            								</Label>
-            								<Label fx:id="hamDocuments" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
-            									<font>
-            										<Font name="System Bold" size="12.0" />
-            									</font>
-                                       <GridPane.margin>
-                                          <Insets left="15.0" />
-                                       </GridPane.margin>
-            								</Label>
-            								<Label fx:id="wellClasiffied" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3">
-            									<font>
-            										<Font name="System Bold" size="12.0" />
-            									</font>
-                                       <GridPane.margin>
-                                          <Insets left="15.0" />
-                                       </GridPane.margin>
-            								</Label>
-                                    <Label layoutX="15.0" layoutY="124.0" text="Documentos mal analizados" GridPane.rowIndex="4">
+                                    <Label layoutX="15.0" layoutY="124.0" text="Documentos bien / mal analizados HAM" GridPane.rowIndex="4">
                                        <font>
                                           <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="badClassified" layoutX="175.0" layoutY="124.0" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                    <Label text="Porcentaje de aciertos total / SPAM / HAM" GridPane.rowIndex="5">
                                        <font>
                                           <Font name="System Bold" size="12.0" />
                                        </font>
+                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <children>
+                  								<Label fx:id="spamDocuments" text="Label">
+                  									<font>
+                  										<Font name="System Bold" size="12.0" />
+                  									</font>
+                  								</Label>
+                                          <Label text=" / " />
+                  								<Label fx:id="hamDocuments" text="Label">
+                  									<font>
+                  										<Font name="System Bold" size="12.0" />
+                  									</font>
+                  								</Label>
+                                       </children>
                                        <GridPane.margin>
                                           <Insets left="15.0" />
                                        </GridPane.margin>
-                                    </Label>
-                                    <Label text="Porcentaje de aciertos" GridPane.rowIndex="5">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="percentage" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                       <children>
+                  								<Label fx:id="wellClasiffied" text="Label">
+                  									<font>
+                  										<Font name="System Bold" size="12.0" />
+                  									</font>
+                  								</Label>
+                                          <Label text=" / " />
+                                          <Label fx:id="badClassified" text="Label">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
                                        <GridPane.margin>
                                           <Insets left="15.0" />
                                        </GridPane.margin>
-                                    </Label>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                       <GridPane.margin>
+                                          <Insets left="15.0" />
+                                       </GridPane.margin>
+                                       <children>
+                                          <Label fx:id="wellSpam" text="Label" />
+                                          <Label text=" / " />
+                                          <Label fx:id="badSpam" text="Label" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                       <GridPane.margin>
+                                          <Insets left="15.0" />
+                                       </GridPane.margin>
+                                       <children>
+                                          <Label fx:id="wellHam" text="Label" />
+                                          <Label text=" / " />
+                                          <Label fx:id="badHam" text="Label" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                       <GridPane.margin>
+                                          <Insets left="15.0" />
+                                       </GridPane.margin>
+                                       <children>
+                                          <Label fx:id="percentage" text="Label">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text=" / " />
+                                          <Label fx:id="spamPercentage" text="Label" />
+                                          <Label text=" / " />
+                                          <Label fx:id="hamPercentage" text="Label" />
+                                       </children>
+                                    </HBox>
             							</children>
                                  <padding>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </padding>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
             						</GridPane>
                            </children>
                         </HBox>
@@ -129,17 +164,17 @@
                   </AnchorPane>
       				<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
       					<children>
-      						<TableView fx:id="table" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      						<TableView fx:id="table" prefHeight="373.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       							<columns>
-                              <TableColumn fx:id="fileName" prefWidth="75.0" text="Nombre de archivo" />
-                              <TableColumn fx:id="spamColumn" prefWidth="75.0" text="Probabilidad SPAM" />
-      								<TableColumn fx:id="hamColumn" prefWidth="150.0" text="Probabilidad HAM" />
-      								<TableColumn fx:id="category" prefWidth="225.0" text="Clasificación" />
-      								<TableColumn fx:id="realCategory" minWidth="7.0" prefWidth="225.0" text="Clasificación Real" />
+                              <TableColumn fx:id="fileName" prefWidth="120.0" text="Nombre de archivo" />
+                              <TableColumn fx:id="spamColumn" prefWidth="120.0" text="Probabilidad SPAM" />
+      								<TableColumn fx:id="hamColumn" prefWidth="120.0" text="Probabilidad HAM" />
+      								<TableColumn fx:id="category" prefWidth="120.0" text="Clasificación" />
+      								<TableColumn fx:id="realCategory" minWidth="7.0" prefWidth="120.0" text="Clasificación Real" />
       							</columns>
-      							<columnResizePolicy>
-      								<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-      							</columnResizePolicy>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
       						</TableView>
       					</children>
       				</AnchorPane>

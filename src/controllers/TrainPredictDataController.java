@@ -11,15 +11,23 @@ import model.Prediction;
 import model.Probability;
 import algorithms.NaiveBayes;
 import application.MainApplication;
-
+/**
+ * Clase controladora de la pantalla en la que se muestra el entrenamiento y la predicción
+ * 
+ * @author Pablo Barrientos Lobato
+ * @author Alberto Salas Cantalejo
+ *
+ */
 public class TrainPredictDataController {
 
+	// Referencia de la aplicación
 	private MainApplication mainApplication;
 
-	// Lista para ver las probabilidades
+	// Lista para ver las probabilidades del entrenamiento y la probabilidad
 	private ObservableList<Probability> probabilitiesData = FXCollections.observableArrayList();
 	private ObservableList<Prediction> predictionsData = FXCollections.observableArrayList();
 
+	// Atributos para conectar los datos que se quieren mostrar con la interfaz
 	@FXML
 	private TableView<Probability> algorithmDataTable;
 
@@ -87,7 +95,25 @@ public class TrainPredictDataController {
 	private Label badClassified;
 	
 	@FXML
+	private Label wellSpam;
+	
+	@FXML
+	private Label badSpam;
+	
+	@FXML
+	private Label wellHam;
+	
+	@FXML
+	private Label badHam;
+	
+	@FXML
 	private Label percentage;
+	
+	@FXML
+	private Label spamPercentage;
+	
+	@FXML
+	private Label hamPercentage;
 	
 	public TrainPredictDataController(){
 		
@@ -101,6 +127,9 @@ public class TrainPredictDataController {
 		this.mainApplication = mainApplication;
 	}
 	
+	/**
+	 * Método que se ejecuta al cargar el controlador. En el se inicializan los datos de las tablas
+	 */
 	@FXML
 	private void initialize(){
 		algorithmWordColumn.setCellValueFactory(cellData -> cellData.getValue().getWord());
@@ -115,6 +144,10 @@ public class TrainPredictDataController {
 		predictionsData.clear();
 	}
 	
+	/**
+	 * Método que recoge todos los datos que se tienen que mostrar en las tablas
+	 * @param alg Instancia del algoritmo NaiveBayes
+	 */
 	public void getData(NaiveBayes alg){
 		probabilitiesData.addAll(alg.getProbabilitiesList());
 		algorithmDataTable.setItems(probabilitiesData);
@@ -132,7 +165,13 @@ public class TrainPredictDataController {
 		this.hamDocuments.setText(alg.getnPredictHamDocuments().toString());
 		this.wellClasiffied.setText(alg.getWellAnalized().toString());
 		this.badClassified.setText(alg.getBadAnalized().toString());
+		this.wellSpam.setText(alg.getWellSpam().toString());
+		this.wellHam.setText(alg.getWellHam().toString());
+		this.badSpam.setText(alg.getBadSpam().toString());
+		this.badHam.setText(alg.getBadHam().toString());
 		this.percentage.setText(Utils.getPercentage(alg.getWellAnalized(), alg.getnPredictDocuments()));
+		this.spamPercentage.setText(Utils.getPercentage(alg.getWellSpam(), alg.getnPredictSpamDocuments()));
+		this.hamPercentage.setText(Utils.getPercentage(alg.getWellHam(), alg.getnPredictHamDocuments()));
 	}
 
 }

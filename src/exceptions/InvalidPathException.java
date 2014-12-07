@@ -1,5 +1,11 @@
 package exceptions;
-
+/**
+ * Excepción de ruta inválida 
+ * 
+ * @author Pablo Barrientos Lobato
+ * @author Alberto Salas Cantalejo
+ *
+ */
 public class InvalidPathException extends Exception {
 
 	/**

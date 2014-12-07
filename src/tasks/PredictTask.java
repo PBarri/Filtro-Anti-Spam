@@ -13,15 +13,25 @@ import model.Prediction;
 import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
-
+/**
+ * Clase que ejecuta una predicción como Task.
+ * Al ejecutarse en segundo plano impide que la aplicación se quede bloqueada.
+ * @see NaiveBayes#predict(String)
+ * 
+ * @author Pablo Barrientos Lobato
+ * @author Alberto Salas Cantalejo
+ *
+ */
 public class PredictTask extends Task<Void> {
 
 	private static final String SPAM = "spam";
 	private static final String HAM = "ham";
 
+	// Atributos privados de la tarea
 	private final MainApplication mainApplication;
 	private final String path;
 
+	// Constructor
 	public PredictTask(MainApplication app, String path) {
 		this.mainApplication = app;
 		this.path = path;
@@ -47,6 +57,10 @@ public class PredictTask extends Task<Void> {
 			Integer nPredictDocuments = filesToAnalize.size();
 			Integer wellAnalized = 0;
 			Integer badAnalized = 0;
+			Integer wellSpam = 0;
+			Integer badSpam = 0;
+			Integer wellHam = 0;
+			Integer badHam = 0;
 			Map<String, List<Float>> predictResults = new HashMap<String, List<Float>>();
 			Map<String, List<Float>> probabilities = alg.getProbabilities();
 			Integer nPredictSpamDocuments = 0;
@@ -59,12 +73,10 @@ public class PredictTask extends Task<Void> {
 			for (File f : filesToAnalize) {
 				if(isCancelled())
 					break;
-				// Inicializamos las probabilidades a las iniciales del
-				// algoritmo
+				// Inicializamos las probabilidades a las iniciales del algoritmo
 				Float totalSpamProb = alg.getInitSpamProb();
 				Float totalHamProb = alg.getInitHamProb();
-				// Inicializamos una lista que contendrá las probabilidades
-				// finales
+				// Inicializamos una lista que contendrá las probabilidades finales
 				List<Float> results = new ArrayList<Float>();
 
 				// Cargamos las palabras contenidas en el correo
@@ -74,10 +86,8 @@ public class PredictTask extends Task<Void> {
 					if(isCancelled())
 						break;
 					if (probabilities.containsKey(s)) {
-						Float tempSpamProb = Math.abs(new Float(Math
-								.log10(probabilities.get(s).get(0))));
-						Float tempHamProb = Math.abs(new Float(Math
-								.log10(probabilities.get(s).get(1))));
+						Float tempSpamProb = Math.abs(new Float(Math.log10(probabilities.get(s).get(0))));
+						Float tempHamProb = Math.abs(new Float(Math.log10(probabilities.get(s).get(1))));
 						totalSpamProb += tempSpamProb;
 						totalHamProb += tempHamProb;
 					}
@@ -95,8 +105,7 @@ public class PredictTask extends Task<Void> {
 					results.add(new Float(2));
 					break;
 				}
-				// Aumentamos el número de archivos que el algoritmo ha
-				// predecido como spam o ham, respectivamente
+				// Aumentamos el número de archivos que el algoritmo ha predecido como spam o ham, respectivamente
 				if (f.getParentFile().getName().equals(SPAM)) {
 					nPredictSpamDocuments++;
 					results.add(new Float(1));
@@ -105,22 +114,26 @@ public class PredictTask extends Task<Void> {
 					results.add(new Float(2));
 				}
 
-				// Comprobamos si el algoritmo de predicción ha dado resultado o
-				// no
+				// Comprobamos si el algoritmo de predicción ha dado resultado o no
 				if (results.get(2).equals(results.get(3))) {
 					wellAnalized++;
+					if(f.getParentFile().getName().equals(SPAM))
+						wellSpam++;
+					else
+						wellHam++;
 				} else {
 					badAnalized++;
+					if(f.getParentFile().getName().equals(SPAM))
+						badSpam++;
+					else
+						badHam++;
 				}
 
-				// Introducimos los resultados en el mapa que se mostrará luego
-				// en la interfaz
+				// Introducimos los resultados en el mapa que se mostrará luego en la interfaz
 				predictResults.put(f.getName(), results);
 
-				Integer perc = (int) Math
-						.round((count.doubleValue() / nPredictDocuments) * 100);
-				updateProgress(perc.doubleValue(),
-						nPredictDocuments.doubleValue());
+				Integer perc = (int) Math.round((count.doubleValue() / nPredictDocuments) * 100);
+				updateProgress(count.doubleValue(), nPredictDocuments.doubleValue());
 				updateMessage("Prediciendo correos... " + perc + "%");
 				count++;
 			}
@@ -140,8 +153,7 @@ public class PredictTask extends Task<Void> {
 				p.setRealCategory(aux.get(3));
 				predictionList.add(p);
 
-				Integer perc = (int) Math
-						.round((count.doubleValue() / resultsSize) * 100);
+				Integer perc = (int) Math.round((count.doubleValue() / resultsSize) * 100);
 				updateProgress(count.doubleValue(), resultsSize.doubleValue());
 				updateMessage("Analizando los resultados... " + perc + "%");
 				count++;
@@ -150,6 +162,10 @@ public class PredictTask extends Task<Void> {
 			// Guardamos los resultados en el algoritmo
 			alg.setWellAnalized(wellAnalized);
 			alg.setBadAnalized(badAnalized);
+			alg.setWellSpam(wellSpam);
+			alg.setBadSpam(badSpam);
+			alg.setWellHam(wellHam);
+			alg.setBadHam(badHam);
 			alg.setPredictResults(predictResults);
 			alg.setPredictionList(predictionList);
 			alg.setnPredictDocuments(nPredictDocuments);

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<BorderPane prefHeight="650.0" prefWidth="600.0" stylesheets="@../css/theme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainApplicationController">
+<BorderPane prefHeight="650.0" prefWidth="750.0" stylesheets="@../css/theme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainApplicationController">
    <top>
       <MenuBar BorderPane.alignment="TOP_LEFT">
         <menus>

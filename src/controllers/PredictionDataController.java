@@ -15,13 +15,21 @@ import model.Prediction;
 import utilities.Utils;
 import algorithms.NaiveBayes;
 import application.MainApplication;
-
+/**
+ * Clase controladora de la pantalla en la que se muestran los datos de la predicción
+ * 
+ * @author Pablo Barrientos Lobato
+ * @author Alberto Salas Cantalejo
+ *
+ */
 public class PredictionDataController {
 	
+	// Referencia a la aplicación
 	private MainApplication mainApplication;
-	
+	// Lista para mostrar los datos de la predicción
 	private ObservableList<Prediction> predictionsData = FXCollections.observableArrayList();
 	
+	// Atributos para conectar los datos que se quieren mostrar con la interfaz
 	@FXML
 	private TableView<Prediction> table;
 	
@@ -56,12 +64,33 @@ public class PredictionDataController {
 	private Label badClassified;
 	
 	@FXML
+	private Label wellSpam;
+	
+	@FXML
+	private Label badSpam;
+	
+	@FXML
+	private Label wellHam;
+	
+	@FXML
+	private Label badHam;
+	
+	@FXML
 	private Label percentage;
+	
+	@FXML
+	private Label spamPercentage;
+	
+	@FXML
+	private Label hamPercentage;
 	
 	public PredictionDataController(){
 		
 	}
 	
+	/**
+	 * Método que se ejecuta al inicializarse el controlador. En este método se inicializan los valores de la tabla
+	 */
 	@FXML
 	private void initialize(){
 		fileName.setCellValueFactory(cellData -> cellData.getValue().getFilename());
@@ -80,6 +109,10 @@ public class PredictionDataController {
 		this.mainApplication = mainApplication;
 	}
 	
+	/**
+	 * Método que se ejecuta para mostrar los datos de la predicción del algoritmo
+	 * @param alg Instancia del algoritmo de NaiveBayes
+	 */
 	public void getPredictionsData(NaiveBayes alg){			
 		predictionsData.addAll(alg.getPredictionList());
 		table.setItems(predictionsData);
@@ -88,19 +121,24 @@ public class PredictionDataController {
 		this.hamDocuments.setText(alg.getnPredictHamDocuments().toString());
 		this.wellClasiffied.setText(alg.getWellAnalized().toString());
 		this.badClassified.setText(alg.getBadAnalized().toString());
+		this.wellSpam.setText(alg.getWellSpam().toString());
+		this.badSpam.setText(alg.getBadSpam().toString());
+		this.wellHam.setText(alg.getWellHam().toString());
+		this.badHam.setText(alg.getBadHam().toString());
 		this.percentage.setText(Utils.getPercentage(alg.getWellAnalized(), alg.getnPredictDocuments()));
+		this.spamPercentage.setText(Utils.getPercentage(alg.getWellSpam(), alg.getnPredictSpamDocuments()));
+		this.hamPercentage.setText(Utils.getPercentage(alg.getWellHam(), alg.getnPredictHamDocuments()));
 	}
 	
+	/**
+	 * Método que se ejecuta al pulsar el botón de Atrás
+	 */
 	@FXML
 	public void back(){
 		Alert alert = Utils.createAlert(AlertType.CONFIRMATION, "Confirmar acción", "¿Desea volver atrás?\nPerderá los datos de la predicción", null, mainApplication);
 		Optional<ButtonType> response = alert.showAndWait();
 		if(response.get().equals(ButtonType.OK))
 			this.mainApplication.showNaiveBayesData();
-//		Action response = Dialogs.create().title("Confirmar acción").masthead(null).message("¿Desea volver atrás?\nPerderá los datos de la predicción").showConfirm();
-//		if(response.equals(Dialog.ACTION_YES)){
-//			this.mainApplication.showNaiveBayesData();
-//		}
 	}
 
 }

@@ -1,7 +1,13 @@
 package exceptions;
 
 import java.io.File;
-
+/**
+ * Excepción que se muestra cuando hay un problema al abrir un archivo
+ * 
+ * @author Pablo Barrientos Lobato
+ * @author Alberto Salas Cantalejo
+ *
+ */
 public class OpenFileException extends Exception {
 	
 	/**
