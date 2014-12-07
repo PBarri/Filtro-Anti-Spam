@@ -184,7 +184,7 @@ public class Utils {
 		
 		// Filtro aplicado mediante una expresión lambda
 		Map<String, Integer> result = map.entrySet().stream()
-				.filter(p -> p.getValue() <= 1)
+				.filter(p -> p.getValue() > 1)
 				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 		
 		return result;
